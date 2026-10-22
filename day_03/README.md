@@ -35,6 +35,7 @@ Your browser will automatically open to `http://localhost:8501`! 🚀
 6. [Managing API Keys Securely with `.env`](#6-managing-api-keys-securely-with-env)
 7. [App Features & Architecture Breakdown](#7-app-features--architecture-breakdown)
 8. [Enterprise LLM Security & Overcoming Prompt Injection](#8-enterprise-llm-security--overcoming-prompt-injection-owasp-defense-in-depth)
+9. [🎓 Live Classroom Security Demo Guide (Full Instructor Script)](SECURITY_DEMO_GUIDE.md)
 
 ---
 

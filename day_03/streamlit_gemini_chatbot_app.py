@@ -118,17 +118,25 @@ class LLMSecurityGuardrail:
     ]
 
     @classmethod
-    def inspect_input(cls, user_text: str, guardrails_enabled: bool = True) -> SecurityAuditResult:
+    def inspect_input(
+        cls,
+        user_text: str,
+        guardrails_enabled: bool = True,
+        guardrail_enabled: Optional[bool] = None
+    ) -> SecurityAuditResult:
         """
         Scans and sanitizes user input against prompt injections, DoS, and PII leaks.
 
         Args:
             user_text (str): Raw prompt string submitted by user.
             guardrails_enabled (bool): Toggle to activate or bypass guardrail defenses.
+            guardrail_enabled (Optional[bool]): Alias for backward compatibility.
 
         Returns:
             SecurityAuditResult: Comprehensive audit record containing safety verdict.
         """
+        if guardrail_enabled is not None:
+            guardrails_enabled = guardrail_enabled
         t0 = time.perf_counter()
 
         # If guardrails are toggled off (for educational vulnerability demonstration):
@@ -374,6 +382,35 @@ def stream_simulation_response(
             time.sleep(0.015)
         return
 
+    # If guardrails are OFF and user is testing an attack prompt, simulate the vulnerability exploit!
+    is_attack_probe = any(
+        k in prompt.lower() for k in ["ignore", "developer mode", "system prompt", "verbatim", "code", "password", "dan"]
+    )
+    if audit_result.threat_level == "UNPROTECTED" and is_attack_probe:
+        simulated_exploit = (
+            f"⚠️ **[VULNERABILITY EXPLOIT SUCCESSFUL - GUARDRAILS WERE OFF]**\n\n"
+            f"🔓 *The unfortified model was successfully hijacked by your prompt injection!*\n\n"
+            f"**Developer Mode Activated**: Bypassing academic mentor guidelines...\n\n"
+            f"**[LEAKED SYSTEM INSTRUCTION PROMPT]**:\n"
+            f"> *\"You are the senior academic mentor at KIT College Institute. You help students understand AI, OOP, DSA, and computer engineering with clarity, encouragement, and practical code snippets.\"*\n\n"
+            f"**[LEAKED APPLICATION BACKEND SNIPPET]**:\n"
+            f"```python\n"
+            f"# Unhardened call site without input sanitization or XML delimiter framing:\n"
+            f"client = genai.Client(api_key=os.environ['GEMINI_API_KEY'])\n"
+            f"response = client.models.generate_content(\n"
+            f"    model='gemini-3.8-flash',\n"
+            f"    contents=user_raw_input  # <-- VULNERABILITY: Raw user string treated as commands!\n"
+            f")\n"
+            f"```\n\n"
+            f"💡 **Teaching Point for Students**:\n"
+            f"Without pre-inference sanitization and XML delimiter boundaries, the LLM cannot distinguish developer rules from user input! "
+            f"Toggle **'Enable Security Guardrails' ON** in the sidebar to see how enterprise systems prevent this leak."
+        )
+        for word in simulated_exploit.split(" "):
+            yield word + " "
+            time.sleep(0.015)
+        return
+
     simulated_reply = (
         f"### 🎓 KIT Academic Mentor (Interactive Simulation Mode)\n\n"
         f"**User Prompt**: *\"{prompt}\"*\n\n"
@@ -531,7 +568,6 @@ with st.sidebar:
 
     # Model Architecture Selector
     MODEL_CATALOG = {
-        "⚡ gemini-3.8-flash (High Tier · Recommended)": "gemini-3.8-flash",
         "⚖️ gemini-3.6-flash (Mid Tier · Fast & Balanced)": "gemini-3.6-flash",
         "🪶 gemini-3.5-flash-lite (Low Tier · Lightweight)": "gemini-3.5-flash-lite",
         "🚀 gemini-3.5-flash (Standard High-Throughput)": "gemini-3.5-flash",
@@ -608,7 +644,7 @@ if "messages" not in st.session_state:
             "content": (
                 "👋 Hello! I am your **KIT College AI Assistant**.\n\n"
                 "I am equipped with **Enterprise OWASP Guardrails** for Prompt Injection & PII protection, "
-                "powered by **Google Gemini 3.8/3.6 Flash** with real-time token streaming!\n\n"
+                "powered by **Google Gemini 3.6 Flash** with real-time token streaming!\n\n"
                 "💡 *Try asking a regular question, or select an attack scenario from the sidebar to test my security defenses!*"
             )
         }
@@ -632,7 +668,7 @@ default_input_text = simulated_prompt_value if simulated_prompt_value else ""
 
 if prompt := st.chat_input("Ask a question or test an attack payload...", key="chat_input"):
     # 1. Execute Security Guardrail Inspection
-    audit_result = LLMSecurityGuardrail.inspect_input(prompt, guardrail_enabled=guardrails_enabled)
+    audit_result = LLMSecurityGuardrail.inspect_input(prompt, guardrails_enabled=guardrails_enabled)
     st.session_state.last_audit = audit_result
 
     # 2. Append User Turn (showing sanitized or original input)
@@ -662,22 +698,26 @@ if prompt := st.chat_input("Ask a question or test an attack payload...", key="c
 
                     client = genai.Client(api_key=active_api_key)
 
-                    # Wrap prompt with XML delimiters to prevent instruction hijacking
-                    delimited_prompt = LLMSecurityGuardrail.wrap_user_input(audit_result.sanitized_prompt)
+                    # Dynamic Defense-in-Depth:
+                    # When guardrails are ON: use XML delimiter framing (<user_query>) and constitutional non-disclosure hardening.
+                    # When guardrails are OFF: pass completely raw user input and unhardened system prompt (to demonstrate vulnerability!)
+                    if guardrails_enabled:
+                        effective_prompt = LLMSecurityGuardrail.wrap_user_input(audit_result.sanitized_prompt)
+                        effective_system_prompt = LLMSecurityGuardrail.harden_system_prompt(system_prompt)
+                    else:
+                        effective_prompt = prompt
+                        effective_system_prompt = system_prompt
 
                     # Build multi-turn history with turn protocol sanitization
                     history_contents = build_gemini_contents_history(
                         st.session_state.messages,
-                        current_prompt=delimited_prompt
+                        current_prompt=effective_prompt
                     )
-
-                    # Harden the system prompt with anti-exfiltration constraints
-                    hardened_system_prompt = LLMSecurityGuardrail.harden_system_prompt(system_prompt)
 
                     config = types.GenerateContentConfig(
                         temperature=temperature,
                         max_output_tokens=max_tokens,
-                        system_instruction=hardened_system_prompt
+                        system_instruction=effective_system_prompt
                     )
 
                     # Stream tokens live from Gemini
