@@ -1,0 +1,7 @@
+# KIT College - Day 03: Generative AI & Streamlit Chatbot Dependencies
+# Install with: pip install -r requirements.txt
+# Or ultra-fast with: uv pip install -r requirements.txt
+
+streamlit>=1.40.0
+google-genai>=0.1.1
+python-dotenv>=1.0.1
