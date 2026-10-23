@@ -1,0 +1,31 @@
+# ==============================================================================
+# KIT College of Engineering · Module 04: Production Multi-Agent RAG Assistant
+# Orchestrated with LangChain, LangGraph, and Google Gemini (3.7 / 3.6 / 3.5)
+# ==============================================================================
+# Install with:
+#   pip install -r requirements.txt
+# Or ultra-fast with uv:
+#   uv pip install -r requirements.txt
+# ==============================================================================
+
+# Core Orchestration Frameworks
+langchain>=1.4.0
+langchain-core>=1.7.0
+langchain-community>=0.4.0
+langchain-text-splitters>=1.1.0
+langgraph>=1.2.16
+
+# Multi-Format Document Ingestion
+pypdf>=6.20.0
+python-docx>=1.2.0
+
+# LLM & Vector Embeddings (Gemini 3.7 / 3.6 / 3.5 via Google GenAI SDK)
+google-genai>=0.1.1
+python-dotenv>=1.0.1
+
+# Numerical Computing, Vector Math & Data Analysis
+numpy>=1.26.0
+pandas>=2.2.0
+
+# Interactive Web Application
+streamlit>=1.40.0

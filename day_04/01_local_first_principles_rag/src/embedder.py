@@ -1,18 +1,19 @@
 """
 embedder.py
-Enterprise Multi-Backend Vector Embedding Engine.
-Supports Google Gemini, OpenAI, or Deterministic Local Vectorization with L2 Normalization.
+LangChain-Compliant Multi-Backend Vector Embedding Engine.
+Supports Google Gemini (text-embedding-004) and local deterministic L2-normalized vectorization.
+Inherits directly from langchain_core.embeddings.Embeddings.
 """
 
 import os
-import math
 import re
 from typing import List
 import numpy as np
+from langchain_core.embeddings import Embeddings
 
-class EnterpriseEmbedder:
+class EnterpriseEmbedder(Embeddings):
     """
-    High-dimensional vector embedding generator.
+    Official LangChain-compliant vector embedding engine.
     Guarantees L2 unit normalization so Dot Product is equivalent to Cosine Similarity.
     """
     def __init__(self, dimension: int = 256, model_name: str = "auto"):
@@ -27,6 +28,22 @@ class EnterpriseEmbedder:
             return "openai"
         return "local_deterministic"
 
+    # --------------------------------------------------------------------------
+    # OFFICIAL LANGCHAIN EMBEDDINGS INTERFACE
+    # --------------------------------------------------------------------------
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        """Encodes a list of document strings into float vector representations."""
+        vectors = self.embed_batch(texts)
+        return [v.tolist() for v in vectors]
+
+    def embed_query(self, text: str) -> List[float]:
+        """Encodes a single query string into a float vector representation."""
+        vec = self.embed_text(text)
+        return vec.tolist()
+
+    # --------------------------------------------------------------------------
+    # LOW-LEVEL VECTOR GENERATORS
+    # --------------------------------------------------------------------------
     def embed_text(self, text: str) -> np.ndarray:
         """Embeds single text string into a normalized numpy vector."""
         if self.backend == "gemini" and "GEMINI_API_KEY" in os.environ:
@@ -40,8 +57,8 @@ class EnterpriseEmbedder:
                 vec = np.array(result.embeddings[0].values, dtype=np.float32)
                 return self._normalize(vec)
             except Exception:
-                pass # Fallback to local if API call errors
-                
+                pass  # Fallback to local deterministic if API call fails
+
         elif self.backend == "openai" and "OPENAI_API_KEY" in os.environ:
             try:
                 from openai import OpenAI
@@ -59,7 +76,7 @@ class EnterpriseEmbedder:
         return self._local_vectorize(text)
 
     def embed_batch(self, texts: List[str]) -> np.ndarray:
-        """Batch encodes multiple strings."""
+        """Batch encodes multiple strings into normalized 2D numpy array."""
         return np.array([self.embed_text(t) for t in texts], dtype=np.float32)
 
     def _local_vectorize(self, text: str) -> np.ndarray:

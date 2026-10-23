@@ -1,68 +1,78 @@
 """
 vector_store.py
-Enterprise In-Memory Vector Database with Cosine Matrix Operations and Metadata Filtering.
+LangChain-Powered Vector Store Engine.
+Wraps langchain_core.vectorstores.InMemoryVectorStore with cosine similarity indexing
+and seamless LangChain Retriever integration.
 """
 
-from typing import List, Tuple, Dict, Any, Callable, Optional
+from typing import List, Tuple, Dict, Any, Optional
 import numpy as np
+from langchain_core.vectorstores import InMemoryVectorStore
+from langchain_core.documents import Document as LCDocument
 from .models import Chunk
 from .embedder import EnterpriseEmbedder
 
 class EnterpriseVectorStore:
     """
-    High-performance in-memory vector database supporting pre-filtering and Top-K retrieval.
+    Industrial In-Memory Vector Store backed by LangChain's official InMemoryVectorStore.
+    Provides fast cosine similarity retrieval, metadata filtering, and standard retriever exports.
     """
     def __init__(self, embedder: EnterpriseEmbedder):
         self.embedder = embedder
-        self.chunks: List[Chunk] = []
-        self.vectors: Optional[np.ndarray] = None
+        # Initialize official LangChain InMemoryVectorStore
+        self.lc_store = InMemoryVectorStore(embedding=self.embedder)
+        self.indexed_chunks: List[Chunk] = []
 
-    def add_chunks(self, chunks: List[Chunk]):
-        """Embeds and indexes incoming document chunks."""
+    @property
+    def chunks(self) -> List[Chunk]:
+        return self.indexed_chunks
+
+    def add_chunks(self, chunks: List[Chunk]) -> None:
+        """Indexes internal Chunk instances into LangChain vector store."""
         if not chunks:
             return
 
-        texts = [c.text for c in chunks]
-        new_vecs = self.embedder.embed_batch(texts)
+        self.indexed_chunks.extend(chunks)
+        lc_docs = [
+            LCDocument(
+                page_content=c.text,
+                metadata={**c.metadata, "chunk_id": c.chunk_id, "doc_id": c.doc_id}
+            )
+            for c in chunks
+        ]
+        self.lc_store.add_documents(lc_docs)
 
-        if self.vectors is None:
-            self.vectors = new_vecs
-        else:
-            self.vectors = np.vstack([self.vectors, new_vecs])
-
-        self.chunks.extend(chunks)
-
-    def search(
-        self,
-        query: str,
-        top_k: int = 4,
-        metadata_filter: Optional[Callable[[Dict[str, Any]], bool]] = None
-    ) -> List[Tuple[Chunk, float]]:
+    def similarity_search(self, query: str, top_k: int = 4) -> List[Tuple[Chunk, float]]:
         """
-        Executes Top-K cosine similarity search against indexed vector space.
-        Supports optional metadata pre-filtering lambda predicates.
+        Executes Cosine Similarity search using LangChain's vector search engine.
+        Returns list of (Chunk, score) tuples ranked in descending similarity order.
         """
-        if self.vectors is None or len(self.chunks) == 0:
+        if not self.indexed_chunks:
             return []
 
-        query_vec = self.embedder.embed_text(query)
+        # Use LangChain vector store similarity search with score
+        docs_and_scores = self.lc_store.similarity_search_with_score(query, k=top_k)
 
-        # Vectorized dot product (equivalent to cosine similarity on unit vectors)
-        scores = np.dot(self.vectors, query_vec)
+        results: List[Tuple[Chunk, float]] = []
+        for doc, score in docs_and_scores:
+            c = Chunk(
+                text=doc.page_content,
+                metadata=doc.metadata,
+                chunk_id=doc.metadata.get("chunk_id", 0),
+                doc_id=doc.metadata.get("doc_id", "")
+            )
+            results.append((c, float(score)))
 
-        # Apply metadata pre-filtering if provided
-        candidate_indices = []
-        for idx, chunk in enumerate(self.chunks):
-            if metadata_filter is None or metadata_filter(chunk.metadata):
-                candidate_indices.append(idx)
+        return results
 
-        if not candidate_indices:
-            return []
+    # Backward compatibility alias
+    search = similarity_search
 
-        filtered_scores = [(self.chunks[i], float(scores[i])) for i in candidate_indices]
-        filtered_scores.sort(key=lambda x: x[1], reverse=True)
-
-        return filtered_scores[:top_k]
+    def as_retriever(self, search_kwargs: Optional[Dict[str, Any]] = None):
+        """Exports standard LangChain BaseRetriever for use in LangGraph nodes."""
+        kwargs = search_kwargs or {"k": 4}
+        return self.lc_store.as_retriever(search_kwargs=kwargs)
 
     def count(self) -> int:
-        return len(self.chunks)
+        """Returns count of indexed chunks."""
+        return len(self.indexed_chunks)

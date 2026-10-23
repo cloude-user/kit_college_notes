@@ -1,0 +1,11 @@
+course_code,course_name,department,semester,credits,faculty_name,faculty_email,has_lab,prerequisites,exam_date
+CS401,Machine Learning & Generative AI,Computer Science,Sem 5,4,Dr. Sundeep K.,sundeep.k@kit.ac.in,Yes,Python & Linear Algebra,2026-11-15
+CS402,Cloud Computing & DevOps Systems,Computer Science,Sem 5,3,Prof. Priya Sharma,priya.sharma@kit.ac.in,Yes,Operating Systems & Networks,2026-11-18
+CS403,Database Management Systems,Computer Science,Sem 4,4,Dr. Rajesh Kumar,rajesh.kumar@kit.ac.in,Yes,Data Structures & C++,2026-11-20
+CS404,Full-Stack Web Engineering,Computer Science,Sem 4,3,Prof. Anita Desai,anita.desai@kit.ac.in,Yes,Object Oriented Programming,2026-11-23
+CS405,Compiler Design & Optimization,Computer Science,Sem 5,3,Dr. Vikram Joshi,vikram.joshi@kit.ac.in,No,Theory of Computation,2026-11-26
+AI501,Deep Learning & Computer Vision,Artificial Intelligence,Sem 6,4,Dr. Arun Patel,arun.patel@kit.ac.in,Yes,CS401 Machine Learning,2026-11-28
+AI502,Natural Language Processing & RAG Agents,Artificial Intelligence,Sem 6,4,Dr. Sneha Reddy,sneha.reddy@kit.ac.in,Yes,CS401 Machine Learning & Python,2026-12-01
+EC301,Digital Signal Processing,Electronics & Comm,Sem 4,4,Prof. Meera Nair,meera.nair@kit.ac.in,Yes,Signals and Systems,2026-11-16
+EC302,Microprocessors & Embedded IoT,Electronics & Comm,Sem 5,4,Dr. K. Raghavan,k.raghavan@kit.ac.in,Yes,Digital Electronics,2026-11-21
+MA201,Discrete Mathematics & Graph Theory,Mathematics,Sem 3,4,Dr. S. Ramanathan,s.ramanathan@kit.ac.in,No,Engineering Mathematics I & II,2026-11-14
