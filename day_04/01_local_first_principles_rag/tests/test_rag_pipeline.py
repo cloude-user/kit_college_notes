@@ -26,6 +26,7 @@ from src.langgraph_agent import LangGraphCollegeCopilot
 class TestStudentRAGPipeline(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        os.environ["OFFLINE_MODE"] = "true"
         cls.data_dir = os.path.join(BASE_DIR, "data")
         cls.handbook_file = os.path.join(cls.data_dir, "kit_college_student_handbook.md")
         cls.hostel_file = os.path.join(cls.data_dir, "kit_campus_hostel_and_mess_guide.docx")

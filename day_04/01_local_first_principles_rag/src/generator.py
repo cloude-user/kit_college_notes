@@ -3,11 +3,17 @@ generator.py
 Grounded Generation & Hallucination Guardrail Engine.
 Powered by Google Gemini (Gemini 3.7 Flash, 3.6 Flash, 3.5 Flash Lite via Google GenAI SDK).
 Enforces bracket citations ([Doc 1: filename]) and handles out-of-context edge cases defensively.
+Also supports General Knowledge queries (coding, explanations, science) when outside campus docs.
 """
 
 import os
 import re
-from typing import List, Tuple
+from typing import List, Tuple, Optional
+from dotenv import load_dotenv
+
+# Ensure environment variables from .env are loaded immediately
+load_dotenv()
+
 from .models import Chunk, GroundedResponse, GroundedCitation
 
 class EnterpriseGroundedGenerator:
@@ -15,15 +21,15 @@ class EnterpriseGroundedGenerator:
     Constructs context-augmented prompts and generates verified, cited enterprise & academic responses.
     Utilizes modern Google Gemini models (3.7 / 3.6 / 3.5).
     """
-    def __init__(self, model_name: str = "auto", temperature: float = 0.1):
+    def __init__(self, model_name: str = "auto", temperature: float = 0.2):
         self.temperature = temperature
-        self.model_name = model_name or os.environ.get("GEMINI_MODEL", "gemini-3.7-flash")
+        self.model_name = model_name or os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
 
     def _resolve_gemini_model(self) -> str:
-        """Selects the modern active Gemini model, prioritizing 3.7 and 3.6."""
-        candidate = os.environ.get("GEMINI_MODEL", "gemini-3.7-flash")
-        if candidate in ["gemini-1.5-flash", "gemini-1.5-pro"]:
-            return "gemini-3.7-flash"  # Upgrade deprecated 1.5 references
+        """Selects the modern active Gemini model, prioritizing 3.8 and 3.7."""
+        candidate = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
+        if candidate in ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash", "gemini-2.5-flash"]:
+            return "gemini-3.8-flash"  # Upgrade deprecated references to modern 3.8
         return candidate
 
     def build_prompt(self, query: str, chunks: List[Tuple[Chunk, float]]) -> str:
@@ -59,11 +65,18 @@ STUDENT INQUIRY:
 """
         return system_prompt
 
-    def generate(self, query: str, retrieved_chunks: List[Tuple[Chunk, float]]) -> GroundedResponse:
+    def generate(
+        self,
+        query: str,
+        retrieved_chunks: List[Tuple[Chunk, float]],
+        temperature: Optional[float] = None
+    ) -> GroundedResponse:
         """
         Executes grounded generation using Gemini 3.7 / 3.6 if API key is present,
         or deterministic offline grounder if running locally without keys.
         """
+        temp = temperature if temperature is not None else self.temperature
+
         if not retrieved_chunks:
             return GroundedResponse(
                 query=query,
@@ -75,41 +88,38 @@ STUDENT INQUIRY:
 
         prompt = self.build_prompt(query, retrieved_chunks)
 
-        # 1. Cloud LLM generation using Google GenAI SDK (Gemini 3.7 / 3.6 / 3.5)
-        if "GEMINI_API_KEY" in os.environ and os.environ.get("OFFLINE_MODE", "false").lower() != "true":
-            try:
-                from google import genai
-                client = genai.Client()
-                model_id = self._resolve_gemini_model()
-                
-                resp = client.models.generate_content(
-                    model=model_id,
-                    contents=prompt
-                )
-                answer_text = resp.text.strip()
-                return self._parse_and_verify_citations(query, answer_text, retrieved_chunks)
-            except Exception:
-                # If selected 3.7 model fails (e.g. rate limit or region), attempt 3.6-flash fallback
+        # 1. Cloud LLM generation using Google GenAI SDK (Gemini 3.8 / 3.7 / 3.6)
+        if os.environ.get("GEMINI_API_KEY") and os.environ.get("OFFLINE_MODE", "false").lower() != "true":
+            models_to_try = [self._resolve_gemini_model(), "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.6-flash"]
+            # Remove duplicates preserving order
+            seen = set()
+            unique_models = [m for m in models_to_try if not (m in seen or seen.add(m))]
+
+            for model_id in unique_models:
                 try:
                     from google import genai
+                    from google.genai import types
                     client = genai.Client()
+                    config = types.GenerateContentConfig(temperature=temp)
                     resp = client.models.generate_content(
-                        model="gemini-3.6-flash",
-                        contents=prompt
+                        model=model_id,
+                        contents=prompt,
+                        config=config
                     )
-                    answer_text = resp.text.strip()
-                    return self._parse_and_verify_citations(query, answer_text, retrieved_chunks)
+                    if resp.text:
+                        answer_text = resp.text.strip()
+                        return self._parse_and_verify_citations(query, answer_text, retrieved_chunks)
                 except Exception:
-                    pass  # Fallback to local grounder
+                    continue
 
-        elif "OPENAI_API_KEY" in os.environ:
+        elif os.environ.get("OPENAI_API_KEY"):
             try:
                 from openai import OpenAI
                 client = OpenAI()
                 resp = client.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=[{"role": "user", "content": prompt}],
-                    temperature=self.temperature
+                    temperature=temp
                 )
                 answer_text = resp.choices[0].message.content.strip()
                 return self._parse_and_verify_citations(query, answer_text, retrieved_chunks)
@@ -118,6 +128,87 @@ STUDENT INQUIRY:
 
         # 2. Local Deterministic Academic Grounder (Failsafe offline generator)
         return self._local_grounded_synthesis(query, retrieved_chunks)
+
+    def generate_general(self, query: str, temperature: float = 0.7) -> str:
+        """
+        Executes general knowledge query generation (coding, science, concepts, advice)
+        using Gemini 3.7 / 3.6 / 3.5 Flash or intelligent educational fallback.
+        """
+        q_clean = query.strip()
+        q_lower = q_clean.lower()
+
+        # Handle greetings naturally
+        if re.search(r"^(hi|hello|hey|good\s+(morning|afternoon|evening))\b", q_lower) and len(q_lower.split()) <= 4:
+            return (
+                "### 👋 Hello! How can I assist you today?\n\n"
+                "I am your **KIT College AI Copilot**. I can help you with:\n"
+                "- 📋 **Academic Policies & Attendance**: Medical condonation rules, 75% threshold, CIA evaluations.\n"
+                "- 📚 **Courses & Faculty**: Subject codes (e.g. `CS401`), instructor details, and exam schedules.\n"
+                "- 🏢 **Campus Life**: Hostel curfews (8:30 PM), mess timings, library borrowing limits, and placement eligibility.\n"
+                "- 💡 **General Knowledge & Study Topics**: Coding problems, engineering mathematics, and study advice.\n\n"
+                "Feel free to ask your question!"
+            )
+
+        # Handle real-time financial market/live commodity queries
+        if re.search(r"\b(gold|silver|stock|share\s+price|crypto|bitcoin|sensex|nifty)\b", q_lower):
+            return (
+                "### 📈 Real-Time Market Information Note\n\n"
+                "I am your **KIT College AI Copilot** specialized in institutional policies, academics, and computer engineering.\n\n"
+                "• **Live Market Data**: Real-time market commodity prices (such as today's 22K/24K gold rates or stock market indices) fluctuate minute-by-minute and require a live financial ticker API.\n"
+                "• **Live Sources**: To get today's accurate, live gold rates in INR, please refer to financial platforms such as **GoodReturns**, **Moneycontrol**, or the **MCX India** bullion index.\n"
+                "• **Campus & Academic Assistance**: Feel free to ask me about any KIT College regulations, courses, attendance calculations, or coding questions!"
+            )
+
+        # Handle casual/playful/slang inputs (e.g. Siuuuu, cheers, haha)
+        if re.search(r"\b(siu+|ronaldo|messi|haha|lol|cheers|cool|awesome|yo|cr7)\b", q_lower):
+            return (
+                "### ⚽ SIUUUU!\n\n"
+                "I love the energy! 🌟 I am your **KIT College AI Copilot**.\n\n"
+                "I am here and ready to help you with:\n"
+                "• **Academic Policies & Attendance**: Medical condonation (65%–74.9%), 75% rule, detention.\n"
+                "• **Courses & Faculty**: Course codes (e.g. `CS401`), credits, professors, and exam dates.\n"
+                "• **Hostel & Campus Life**: 8:30 PM curfew, mess timings, library fines (₹5/day), and placements.\n"
+                "• **Engineering & Studies**: Coding challenges, algorithms, or concept explanations.\n\n"
+                "What would you like to explore next?"
+            )
+
+        sys_prompt = (
+            "You are an expert AI Assistant and Academic Mentor at KIT College of Engineering. "
+            "Provide a comprehensive, accurate, step-by-step, and educational explanation to the user's question. "
+            "Use clear headings, code blocks if applicable, and engaging formatting."
+        )
+        full_prompt = f"{sys_prompt}\n\nUSER QUESTION:\n{query}"
+
+        if os.environ.get("GEMINI_API_KEY") and os.environ.get("OFFLINE_MODE", "false").lower() != "true":
+            models_to_try = [self._resolve_gemini_model(), "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.6-flash"]
+            seen = set()
+            unique_models = [m for m in models_to_try if not (m in seen or seen.add(m))]
+
+            for model_id in unique_models:
+                try:
+                    from google import genai
+                    from google.genai import types
+                    client = genai.Client()
+                    config = types.GenerateContentConfig(temperature=temperature)
+                    resp = client.models.generate_content(
+                        model=model_id,
+                        contents=full_prompt,
+                        config=config
+                    )
+                    if resp.text:
+                        return resp.text.strip()
+                except Exception:
+                    continue
+
+        # Offline educational response simulation
+        return (
+            f"### 💡 Academic Mentor Response\n\n"
+            f"Here is an overview for **'{query}'**:\n\n"
+            f"1. **Core Understanding**: This topic addresses key computing, engineering, or analytical principles.\n"
+            f"2. **Structured Analysis**: Identify the known variables, evaluate the problem scope, and apply standard algorithmic steps.\n"
+            f"3. **KIT Academic Context**: For campus-specific inquiries, consult your course faculty or KIT student handbook.\n\n"
+            f"*(Generated in local offline mode)*"
+        )
 
     def _parse_and_verify_citations(
         self,
@@ -139,16 +230,25 @@ STUDENT INQUIRY:
                         claim=f"Information referenced from context block {tag_num}",
                         doc_tag=f"[Doc {tag_num}]",
                         source_file=chunk.metadata.get("source", "unknown"),
+                        source_section=chunk.metadata.get("section", "General"),
                         verified=True
                     )
                 )
+
+        # Calculate confidence
+        if is_insufficient:
+            confidence = 0.0
+            has_context = False
+        else:
+            has_context = True
+            confidence = min(1.0, 0.6 + 0.1 * len(citations)) if citations else 0.5
 
         return GroundedResponse(
             query=query,
             answer=answer_text,
             citations=citations,
-            has_sufficient_context=not is_insufficient,
-            confidence_score=0.98 if not is_insufficient else 0.10
+            has_sufficient_context=has_context,
+            confidence_score=confidence
         )
 
     def _local_grounded_synthesis(
@@ -156,26 +256,34 @@ STUDENT INQUIRY:
         query: str,
         retrieved_chunks: List[Tuple[Chunk, float]]
     ) -> GroundedResponse:
-        """High-precision local template synthesizer for offline execution."""
+        """Deterministic offline fallback synthesis."""
         q_lower = query.lower()
-        # Check for out-of-domain / irrelevant query using content terms and match ratio
-        stopwords = {"what", "is", "the", "for", "a", "an", "in", "to", "of", "and", "how", "do", "does", "by", "all", "are", "on", "what", "with", "if", "college", "campus"}
-        content_terms = [t for t in re.findall(r"[A-Za-z0-9_\-]+", q_lower) if t not in stopwords and len(t) > 3]
+        q_words = set(re.findall(r"\w+", q_lower))
+        stop_words = {
+            "what", "is", "the", "and", "or", "for", "can", "i", "if", "my", "to", "how", "a", "an", "in", "of",
+            "do", "you", "have", "students", "student", "campus", "college", "kit", "bring", "personal", "please",
+            "tell", "me", "there", "are", "about", "with", "this", "that"
+        }
+        content_words = q_words - stop_words
 
-        # Select best chunk with highest term intersection among top candidates
+        # Select candidate chunk with highest query word intersection
         best_chunk, best_score = retrieved_chunks[0]
-        max_matches = 0
-        for chunk, score in retrieved_chunks[:3]:
-            matches_count = sum(1 for t in content_terms if t in chunk.text.lower())
-            if matches_count > max_matches:
-                max_matches = matches_count
+        max_overlap = -1
+        chosen_rank = 1
+
+        for idx, (chunk, score) in enumerate(retrieved_chunks[:3], 1):
+            c_words = set(re.findall(r"\w+", chunk.text.lower()))
+            overlap = len(content_words.intersection(c_words))
+            if overlap > max_overlap:
+                max_overlap = overlap
                 best_chunk = chunk
                 best_score = score
+                chosen_rank = idx
 
-        matches = [t for t in content_terms if t in best_chunk.text.lower()]
-        match_ratio = (len(matches) / max(1, len(content_terms))) if content_terms else 1.0
-
-        if match_ratio < 0.28:
+        # Defensive out-of-domain check
+        campus_core_topics = ["attendance", "hostel", "placement", "library", "course", "curriculum", "exam", "condonation", "curfew", "mess", "cgpa", "arrear", "credit"]
+        has_core_topic = any(k in q_lower for k in campus_core_topics)
+        if (max_overlap <= 1 or not has_core_topic) and not has_core_topic:
             return GroundedResponse(
                 query=query,
                 answer="Insufficient context: The provided enterprise documentation does not contain this information.",
@@ -184,25 +292,27 @@ STUDENT INQUIRY:
                 confidence_score=0.0
             )
 
-        citations = [
-            GroundedCitation(
-                claim=best_chunk.text[:80] + "...",
-                doc_tag="[Doc 1]",
-                source_file=best_chunk.metadata.get("source", "unknown"),
-                verified=True
-            )
-        ]
+        source = best_chunk.metadata.get("source", "unknown")
+        section = best_chunk.metadata.get("section", "Policy Guideline")
+        snippet = best_chunk.text.strip().replace("\n\n", " ")
 
-        cleaned_text = best_chunk.text.strip().replace("\n\n", " ").replace("\n", " ")
-        if len(cleaned_text) > 280:
-            cleaned_text = cleaned_text[:280] + "..."
+        grounded_answer = (
+            f"Based on **{section}** in `{source}`: {snippet[:300]}... [Doc {chosen_rank}]\n\n"
+            f"> *Source Reference: [Doc {chosen_rank}: {source} — {section}]*"
+        )
 
-        answer_text = f"{cleaned_text} [Doc 1]"
+        citation = GroundedCitation(
+            claim=f"Official academic statement from {section}",
+            doc_tag=f"[Doc {chosen_rank}]",
+            source_file=source,
+            source_section=section,
+            verified=True
+        )
 
         return GroundedResponse(
             query=query,
-            answer=answer_text,
-            citations=citations,
+            answer=grounded_answer,
+            citations=[citation],
             has_sufficient_context=True,
             confidence_score=0.92
         )

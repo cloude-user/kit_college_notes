@@ -2,7 +2,7 @@
 langgraph_agent.py
 StateGraph Multi-Agent Orchestrator powered by LangGraph & LangChain.
 Coordinates intent classification, document RAG, deterministic course queries,
-attendance condonation calculation, and citation verification.
+attendance condonation calculation, citation verification, and general AI knowledge.
 """
 
 import re
@@ -20,7 +20,9 @@ class CollegeCopilotState(TypedDict):
     Central State Schema passed through the compiled LangGraph execution graph.
     """
     query: str
-    route: str                          # "condonation_calculator" | "course_catalog" | "policy_rag"
+    temperature: float
+    allow_general_knowledge: bool
+    route: str                          # "condonation_calculator" | "course_catalog" | "policy_rag" | "general_knowledge"
     route_reason: str
     retrieved_chunks: List[Dict[str, Any]]
     catalog_results: List[Dict[str, Any]]
@@ -58,6 +60,7 @@ class LangGraphCollegeCopilot:
         builder.add_node("condonation_calculator_node", self._node_condonation_calculator)
         builder.add_node("course_catalog_node", self._node_course_catalog)
         builder.add_node("policy_rag_node", self._node_policy_rag)
+        builder.add_node("general_knowledge_node", self._node_general_knowledge)
         builder.add_node("synthesizer_node", self._node_synthesizer)
         builder.add_node("citation_verifier_node", self._node_citation_verifier)
 
@@ -71,7 +74,8 @@ class LangGraphCollegeCopilot:
             {
                 "condonation_calculator": "condonation_calculator_node",
                 "course_catalog": "course_catalog_node",
-                "policy_rag": "policy_rag_node"
+                "policy_rag": "policy_rag_node",
+                "general_knowledge": "general_knowledge_node"
             }
         )
 
@@ -79,6 +83,7 @@ class LangGraphCollegeCopilot:
         builder.add_edge("condonation_calculator_node", "synthesizer_node")
         builder.add_edge("course_catalog_node", "synthesizer_node")
         builder.add_edge("policy_rag_node", "synthesizer_node")
+        builder.add_edge("general_knowledge_node", "synthesizer_node")
         builder.add_edge("synthesizer_node", "citation_verifier_node")
         builder.add_edge("citation_verifier_node", END)
 
@@ -96,26 +101,57 @@ class LangGraphCollegeCopilot:
     def _node_router(self, state: CollegeCopilotState) -> Dict[str, Any]:
         q = state["query"].lower()
         trace = list(state.get("trace_steps", []))
+        allow_general = state.get("allow_general_knowledge", True)
+
+        # Helper: check for whole-word matches to prevent substring false-positives (e.g. 'od' inside 'today')
+        def _matches_any(text: str, keywords: List[str]) -> bool:
+            for kw in keywords:
+                pattern = r"\b" + re.escape(kw) + r"\b"
+                if re.search(pattern, text, re.IGNORECASE):
+                    return True
+            return False
 
         # Check for numeric attendance or condonation inquiry
         attendance_match = re.search(r"(\d{1,3}(?:\.\d+)?)\s*%", q)
-        attendance_keywords = ["attendance", "condonation", "detained", "shortage", "eligible to write", "sit for exam", "lack of attendance"]
-        is_condonation_query = bool(attendance_match) or any(k in q for k in ["condonation", "detention", "detained"])
+        attendance_keywords = [
+            "attendance", "condonation", "detained", "detention", "shortage",
+            "eligible to write", "sit for exam", "lack of attendance"
+        ]
+        is_condonation_query = bool(attendance_match) or _matches_any(q, ["condonation", "detention", "detained", "shortage"])
 
         # Check for course code or course curriculum lookup
         course_code_match = re.search(r"\b([a-z]{2}\d{3})\b", q)
-        course_keywords = ["credits", "who teaches", "faculty", "professor", "prerequisite", "curriculum", "subject code", "exam date", "course code", "syllabus"]
-        is_course_query = bool(course_code_match) or (any(k in q for k in course_keywords) and not is_condonation_query)
+        course_keywords = [
+            "credits", "who teaches", "faculty", "professor", "prerequisite", "prerequisites",
+            "curriculum", "subject code", "exam date", "course code", "syllabus"
+        ]
+        is_course_query = bool(course_code_match) or (_matches_any(q, course_keywords) and not is_condonation_query)
 
-        if is_condonation_query and (attendance_match or "condonation" in q or "detained" in q or "shortage" in q):
+        # Check for college policy keywords with word boundaries
+        campus_keywords = [
+            "hostel", "mess", "curfew", "food", "dinner", "breakfast", "lunch", "wifi", "library", "book", "books",
+            "fine", "fines", "placement", "placements", "internship", "internships", "cgpa", "arrear", "arrears",
+            "grading", "cat-1", "cat-2", "see exam", "see examination", "semester end exam", "semester end examination",
+            "cia", "dean", "hod", "ragging", "medical condonation", "medical certificate", "on-duty", "on duty", "od",
+            "kit", "campus"
+        ]
+        is_campus_policy = _matches_any(q, campus_keywords)
+
+        if is_condonation_query and (attendance_match or _matches_any(q, ["condonation", "detained", "detention", "shortage"])):
             route = "condonation_calculator"
             reason = "Query contains attendance percentage or condonation policy inquiry. Routing to deterministic Condonation Calculator."
         elif is_course_query:
             route = "course_catalog"
             reason = "Query requests specific course code, credits, faculty, or curriculum details. Routing to Course Catalog DB."
+        elif is_campus_policy:
+            route = "policy_rag"
+            reason = "Query inquires about official academic regulations, library, hostel, placement, or campus conduct. Routing to Hybrid Policy RAG."
+        elif allow_general:
+            route = "general_knowledge"
+            reason = "Query asks for general knowledge, coding, concept explanations, or general academic assistance outside official handbooks."
         else:
             route = "policy_rag"
-            reason = "Query inquires about general academic regulations, library, hostel, placement, or campus conduct. Routing to Hybrid Policy RAG."
+            reason = "Strict handbook mode active. Routing query to Policy RAG with out-of-domain defense guardrail."
 
         trace.append({
             "node": "🔀 Router Node",
@@ -141,7 +177,6 @@ class LangGraphCollegeCopilot:
         pct = float(pct_match.group(1)) if pct_match else None
 
         if pct is None:
-            # Check for words like "seventy two percent" or digits
             dig_match = re.search(r"\b(\d{2})\b", q)
             if dig_match:
                 pct = float(dig_match.group(1))
@@ -159,19 +194,19 @@ class LangGraphCollegeCopilot:
 
         if pct is not None:
             if pct >= 75.0:
-                cia_marks = 5 if pct >= 100 else (4 if pct >= 90 else (3 if pct >= 80 else 2))
                 calc_data.update({
                     "status": "Fully Eligible for SEE",
                     "eligible": True,
-                    "cia_marks": cia_marks,
-                    "action_required": f"No action needed. You satisfy the 75% threshold and earn {cia_marks}/5 CIA attendance marks."
+                    "cia_marks": 5 if pct == 100.0 else (4 if pct >= 90.0 else (3 if pct >= 80.0 else 2)),
+                    "action_required": "No action required. You are fully qualified to appear for the Semester End Examination."
                 })
             elif 65.0 <= pct < 75.0:
                 calc_data.update({
                     "status": "Medical Condonation Applicable",
-                    "eligible": False, # until condonation granted
+                    "eligible": False,
                     "condonation_applicable": True,
                     "fee_inr": 500,
+                    "cia_marks": 0,
                     "action_required": (
                         "Submit a Government Doctor Medical Certificate & discharge summary to HOD "
                         "within 3 calendar days of resuming classes, and pay ₹500 condonation processing fee per subject."
@@ -183,14 +218,14 @@ class LangGraphCollegeCopilot:
                     "eligible": False,
                     "detained": True,
                     "action_required": (
-                        "Attendance is below 65.0%. As per Section 1.3, you are strictly detained and barred "
-                        "from writing the Semester End Examination (SEE). You must re-register during the subsequent academic year."
+                        "Attendance is below 65.0%. Grade 'DE' will be awarded. "
+                        "Strictly barred from Semester End Examination. Must re-register in subsequent academic year."
                     )
                 })
 
         trace.append({
             "node": "🧮 Condonation Calculator Node",
-            "action": f"Executed attendance evaluation for {pct}%",
+            "action": f"Executed attendance evaluation for {pct}%" if pct else "Retrieved general attendance condonation rules",
             "details": f"Result: {calc_data['status']}"
         })
 
@@ -200,34 +235,29 @@ class LangGraphCollegeCopilot:
         }
 
     # --------------------------------------------------------------------------
-    # NODE 3: COURSE CATALOG NODE (Deterministic Structured Lookups)
+    # NODE 3: COURSE CATALOG NODE (Structured Tabular Lookups)
     # --------------------------------------------------------------------------
     def _node_course_catalog(self, state: CollegeCopilotState) -> Dict[str, Any]:
-        q = state["query"].lower()
+        q = state["query"].upper()
         trace = list(state.get("trace_steps", []))
+
+        # Look for matching course code e.g. CS401
         matched_records = []
-
-        # Find course codes (e.g., CS401, AI502)
-        code_match = re.search(r"\b([a-z]{2}\d{3})\b", q)
-        target_code = code_match.group(1).upper() if code_match else None
-
         for row in self.course_catalog:
             code = row.get("course_code", "").upper()
-            name = row.get("course_name", "").lower()
-            faculty = row.get("faculty_name", "").lower()
-            dept = row.get("department", "").lower()
-
-            if target_code and target_code == code:
+            name = row.get("course_name", "").upper()
+            if code and (code in q or any(term in q for term in code.split())):
                 matched_records.append(row)
-            elif not target_code:
-                # Check for topic match (e.g. machine learning, devops, networks)
-                words = [w for w in q.split() if len(w) > 3]
-                if any(w in name for w in words) or any(w in faculty for w in words) or any(w in dept for w in words):
-                    matched_records.append(row)
+            elif name and any(word in q for word in name.split() if len(word) > 3):
+                matched_records.append(row)
+
+        if not matched_records and self.course_catalog:
+            # Fallback: if user asked general faculty or course, return top 2
+            matched_records = self.course_catalog[:2]
 
         trace.append({
             "node": "📊 Course Catalog Node",
-            "action": f"Queried course database for '{target_code or q}'",
+            "action": f"Queried course database for '{state['query']}'",
             "details": f"Retrieved {len(matched_records)} matching course records from curriculum database."
         })
 
@@ -272,15 +302,50 @@ class LangGraphCollegeCopilot:
         }
 
     # --------------------------------------------------------------------------
-    # NODE 5: SYNTHESIZER NODE (Grounding with Bracket Citations)
+    # NODE 5: GENERAL KNOWLEDGE NODE (ChatGPT / Gemini Mode)
+    # --------------------------------------------------------------------------
+    def _node_general_knowledge(self, state: CollegeCopilotState) -> Dict[str, Any]:
+        q = state["query"]
+        temp = state.get("temperature", 0.7)
+        trace = list(state.get("trace_steps", []))
+
+        answer_text = self.generator.generate_general(q, temperature=temp)
+
+        trace.append({
+            "node": "🌐 General Knowledge Node",
+            "action": "Generated educational AI response using Gemini",
+            "details": f"Addressed non-campus general query at temperature {temp}"
+        })
+
+        return {
+            "generation": answer_text,
+            "citations": [],
+            "has_sufficient_context": True,
+            "confidence_score": 0.95,
+            "trace_steps": trace
+        }
+
+    # --------------------------------------------------------------------------
+    # NODE 6: SYNTHESIZER NODE (Grounding with Bracket Citations)
     # --------------------------------------------------------------------------
     def _node_synthesizer(self, state: CollegeCopilotState) -> Dict[str, Any]:
         route = state.get("route")
         q = state["query"]
+        temp = state.get("temperature", 0.2)
         trace = list(state.get("trace_steps", []))
 
-        # Case A: Condonation Calculator Output
-        if route == "condonation_calculator":
+        # Case A: General Knowledge Output (Already generated)
+        if route == "general_knowledge":
+            return {
+                "generation": state.get("generation", ""),
+                "citations": [],
+                "has_sufficient_context": True,
+                "confidence_score": 0.95,
+                "trace_steps": trace
+            }
+
+        # Case B: Condonation Calculator Output
+        elif route == "condonation_calculator":
             calc = state.get("calculator_data", {})
             pct = calc.get("provided_percentage")
             status = calc.get("status")
@@ -324,28 +389,24 @@ class LangGraphCollegeCopilot:
                 "trace_steps": trace
             }
 
-        # Case B: Course Catalog Output
+        # Case C: Course Catalog Output
         elif route == "course_catalog":
             records = state.get("catalog_results", [])
             if not records:
-                # Fallback to general RAG if no exact table record found
-                candidates = self.retriever.retrieve(q, top_k=3)
-                reranked = self.reranker.rerank(q, candidates, top_n=2)
-                grounded = self.generator.generate(q, reranked)
-                answer = grounded.answer
-                citations = [c.model_dump() if hasattr(c, "model_dump") else c.__dict__ for c in grounded.citations]
+                answer = "I could not find a matching course in the KIT curriculum database. Please verify the course code (e.g., CS401, AI501)."
+                citations = []
             else:
                 lines = ["### 📚 Course Catalog & Curriculum Specification\n"]
                 for r in records:
-                    code = r.get("course_code", "")
-                    name = r.get("course_name", "")
-                    credits = r.get("credits", "")
-                    faculty = r.get("faculty_name", "")
+                    code = r.get("course_code", "Course")
+                    name = r.get("course_name", "Subject")
+                    credits = r.get("credits", "4")
+                    faculty = r.get("faculty_name", "Faculty Member")
                     email = r.get("faculty_email", "")
                     sem = r.get("semester", "")
                     lab = r.get("has_lab", "No")
                     prereq = r.get("prerequisites", "None")
-                    exam = r.get("exam_date", "TBA")
+                    exam = r.get("exam_date", "TBD")
 
                     lines.append(f"#### **{code}: {name}** (`{credits} Credits`) [Doc 1]")
                     lines.append(f"- **Instructor**: {faculty} ({email}) [Doc 1]")
@@ -376,10 +437,9 @@ class LangGraphCollegeCopilot:
                 "trace_steps": trace
             }
 
-        # Case C: Policy RAG Output
+        # Case D: Policy RAG Output
         else:
             chunks_data = state.get("retrieved_chunks", [])
-            # Convert dict chunks back to Chunk instances for generator
             chunk_tuples = []
             for c in chunks_data:
                 chunk_obj = Chunk(
@@ -392,7 +452,7 @@ class LangGraphCollegeCopilot:
                 )
                 chunk_tuples.append((chunk_obj, c["score"]))
 
-            grounded = self.generator.generate(q, chunk_tuples)
+            grounded = self.generator.generate(q, chunk_tuples, temperature=temp)
             citations = [c.model_dump() if hasattr(c, "model_dump") else c.__dict__ for c in grounded.citations]
 
             trace.append({
@@ -410,22 +470,29 @@ class LangGraphCollegeCopilot:
             }
 
     # --------------------------------------------------------------------------
-    # NODE 6: CITATION VERIFIER & QUALITY GUARD NODE
+    # NODE 7: CITATION VERIFIER NODE
     # --------------------------------------------------------------------------
     def _node_citation_verifier(self, state: CollegeCopilotState) -> Dict[str, Any]:
         answer = state.get("generation", "")
+        route = state.get("route", "")
         trace = list(state.get("trace_steps", []))
-        citations = state.get("citations", [])
 
-        # Check for bracket tags like [Doc 1], [Doc 2]
+        # General knowledge does not require handbook citations
+        if route == "general_knowledge":
+            trace.append({
+                "node": "🛡️ Citation Verifier Node",
+                "action": "General AI Knowledge Mode: Bracket citations not required",
+                "details": "Status: ✅ PASSED (General Intelligence)"
+            })
+            return {"citations": [], "trace_steps": trace}
+
         doc_tags = re.findall(r"\[Doc\s*(\d+)\]", answer)
-        verified_count = 0
+        citations = list(state.get("citations", []))
 
-        for c in citations:
-            tag = c.get("doc_tag", "")
-            if tag in answer:
-                c["verified"] = True
-                verified_count += 1
+        for idx, c in enumerate(citations):
+            tag = c.get("doc_tag")
+            if tag and tag in answer:
+                citations[idx]["verified"] = True
 
         pass_guard = (len(doc_tags) > 0 or not state.get("has_sufficient_context", True))
 
@@ -443,11 +510,18 @@ class LangGraphCollegeCopilot:
     # --------------------------------------------------------------------------
     # EXECUTE RUNNER
     # --------------------------------------------------------------------------
-    def run(self, query: str) -> CollegeCopilotState:
+    def run(
+        self,
+        query: str,
+        temperature: float = 0.2,
+        allow_general_knowledge: bool = True
+    ) -> CollegeCopilotState:
         """Executes query through the compiled LangGraph StateGraph pipeline."""
         t0 = time.perf_counter()
         initial_state: CollegeCopilotState = {
             "query": query,
+            "temperature": temperature,
+            "allow_general_knowledge": allow_general_knowledge,
             "route": "policy_rag",
             "route_reason": "",
             "retrieved_chunks": [],

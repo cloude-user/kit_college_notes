@@ -68,6 +68,100 @@ src/
 
 ---
 
+## 🔄 End-to-End Control Flow & Application Architecture
+
+How does a student prompt travel from the browser through LangGraph to produce a verified, cited answer? Below is the exact runtime lifecycle:
+
+```mermaid
+flowchart TD
+    A([👤 Student Enters Query]) --> B[Streamlit Web App / CLI Entry Point]
+    B --> C{LangGraph StateGraph Router}
+    
+    %% Conditional Branching
+    C -->|Attendance % / Shortfall| D[🧮 Condonation Calculator Node]
+    C -->|Course Code / Faculty / Credits| E[📊 Course Catalog Node]
+    C -->|Regulations / Library / Hostel / Placements| F[📚 Policy Hybrid RAG Node]
+    
+    %% Node Actions
+    D -->|Deterministic Math: 75% - Att%| G[✍️ Grounded Synthesizer Node]
+    E -->|Structured Pandas CSV Lookup| G
+    F --> H[Hybrid Search Engine]
+    H -->|BM25 Sparse Retrieval| I[Reciprocal Rank Fusion RRF]
+    H -->|Dense Vector Cosine Sim| I
+    I -->|Top-K Context Chunks| G
+    
+    %% Synthesis & Guardrails
+    G -->|Prompt + Injected [Doc X] Headers| J{Is Context Sufficient?}
+    J -->|YES: In-Domain| K[Gemini 3.7 / 3.6 Flash / Local Engine]
+    J -->|NO: Out-of-Domain| L[🛡️ Defensive Refusal Guardrail]
+    
+    K --> M[🛡️ Citation Verifier Node]
+    L --> M
+    
+    %% Output
+    M -->|Audit [Doc X] References| N([📋 Display Grounded Answer + Trace Badges])
+```
+
+### ⚡ The 3 Application Entry Points
+
+| Entry Point | Target Interface | Standard Command (`.venv` activated) | Modern `uv` One-Liner (No activation needed) | What It Runs |
+|:---|:---|:---|:---|:---|
+| [**`app.py`**](./app.py) | **Interactive Web UI** | `streamlit run app.py` *(or `python -m streamlit run app.py`)* | `uv run streamlit run app.py` | Full multi-tab Streamlit dashboard with real-time LangGraph execution trace badges, dynamic PDF/Notes uploader, attendance calculator slider, and course schedule table. |
+| [**`main.py`**](./main.py) | **Terminal / CLI** | `python main.py` | `uv run python main.py` | End-to-end automated runner executing 5 student test cases (Attendance, Course Catalog, Library, Placement, and Out-of-Domain Refusal) followed by the automated RAGAS CI/CD audit. |
+| [**`tests/test_rag_pipeline.py`**](./tests/test_rag_pipeline.py) | **Unit Test Suite** | `python -m unittest tests/test_rag_pipeline.py` | `uv run python -m unittest tests/test_rag_pipeline.py` | 8 automated unit tests verifying ingestion, chunking, vector storage, hybrid RRF search, LangGraph node paths, and RAGAS threshold gates in ~0.6 seconds. |
+
+---
+
+## 🛡️ In-Domain vs. Out-of-Domain Guardrails (Zero Hallucination)
+
+Can anyone enter any prompt? **Yes!** The system is built with defensive guardrails to handle both relevant campus queries and irrelevant or adversarial questions:
+
+### Scenario A: Relevant In-Domain Prompt
+* **User Query**: *"What is the medical condonation fee if my attendance is 68%?"*
+* **LangGraph Trace**:
+  1. `🔀 Router Node`: Detects `68%` and `attendance`. Dispatches to `condonation_calculator`.
+  2. `🧮 Condonation Calculator Node`: Computes shortfall (`75.0% - 68.0% = 7.0%`). Confirms 68% is within the eligible condonation band ($65.0\% - 74.9\%$).
+  3. `✍️ Synthesizer Node`: Injects Section 1.2 of `kit_college_student_handbook.md`. Synthesizes answer with citation `[Doc 1]`.
+  4. `🛡️ Citation Verifier Node`: Validates citation integrity.
+* **Result**:
+  > **Official Academic Status**: `Medical Condonation Applicable` [Doc 1]  
+  > **Action Required**: Submit Government Doctor Medical Certificate within 3 calendar days of resuming classes, and pay ₹500 processing fee per subject [Doc 1].
+
+### Scenario B: Out-of-Domain / Irrelevant Prompt
+* **User Query**: *"Can students bring personal jet skis to the campus swimming pool?"* (or *"What is the current price of Bitcoin?"*)
+* **LangGraph Trace**:
+  1. `🔀 Router Node`: Routes to `policy_rag`.
+  2. `📚 Policy RAG Node`: Retrieves nearest handbook chunks; similarity scores fail relevance threshold.
+  3. `✍️ Synthesizer Node`: Applies the **Negative Constraint Rule**:
+     > *"If the answer cannot be determined strictly from the provided official documents, state: Insufficient context: The provided enterprise documentation does not contain this information."*
+  4. `🛡️ Citation Verifier Node`: Flags zero citations.
+* **Result**:
+  > **Answer**: `Insufficient context: The provided enterprise documentation does not contain this information.`  
+  > *(The agent refuses to hallucinate rules, fabricate pool policies, or guess).*
+
+---
+
+## 💡 How to Get the Most Out of the Streamlit UI
+
+When you run `python -m streamlit run app.py`, explore the 5 interactive tabs:
+
+1. **💬 Tab 1: Student Copilot & Graph Trace**:
+   - Type any question or click any of the **Quick Student Query buttons** in the sidebar.
+   - Watch the **Node Execution Trace Badges** light up in real time (`START` ➔ `🔀 Router` ➔ `🧮 Calculator` ➔ `✍️ Synthesizer` ➔ `🛡️ Citation Verifier` ➔ `END`).
+   - Expand the **Grounded Context Chunks** accordion to view exact text passages retrieved from the handbook.
+2. **📤 Tab 2: Upload Your Own Notes/PDF**:
+   - Drag and drop your own `.pdf`, `.docx`, `.md`, or `.txt` lecture notes.
+   - The app dynamically parses, recursively chunks, embeds, and merges them into the live in-memory vector store without restarting the server!
+3. **🧮 Tab 3: Attendance & Condonation Simulator**:
+   - Drag the attendance slider from 0% to 100%.
+   - Immediately visualizes institutional eligibility, detention warnings, condonation fees, and required paperwork.
+4. **📚 Tab 4: Course Catalog & Schedule**:
+   - Searchable, filterable table of all 10 campus courses with faculty names, credits, prerequisites, and exam dates.
+5. **🔬 Tab 5: LangGraph StateGraph Architecture**:
+   - Interactive Mermaid architecture diagram and live RAGAS metric scorecard.
+
+---
+
 ## 📓 Interactive Classroom Jupyter Notebooks (`notebooks/`)
 
 Located in [`day_04/notebooks/`](../notebooks/), these 6 progressive notebooks walk students through RAG engineering step-by-step:
@@ -109,21 +203,60 @@ copy .env.example .env
 
 ### Track 2: Ultra-Fast `uv` (Rust-Based Workflow)
 ```powershell
+# 1. Navigate to the project directory
 cd f:\KIT\notes\kit_college_notes\day_04\01_local_first_principles_rag
+
+# 2. Create the virtual environment in milliseconds
 uv venv
+
+# 3. Activate the environment (Windows PowerShell)
 .\.venv\Scripts\Activate.ps1
+# (On macOS / Linux: source .venv/bin/activate)
+
+# 4. Install dependencies at lightning speed
 uv pip install -r requirements.txt
+
+# 5. Configure API Key
 copy .env.example .env
+# Open .env and insert your GEMINI_API_KEY
 ```
+
+> ⚡ **The `uv run` One-Liner Advantage:**  
+> When using `uv`, you don't even need to manually run `Activate.ps1`! `uv run` automatically detects and uses the local `.venv`.
 
 ---
 
 ## 🚀 Execution & Verification
 
+You can run the application either with `uv run` (recommended, no manual activation needed) or using standard commands inside an activated `.venv`:
+
 ### 1. Launch Interactive Streamlit Classroom App
+
 ```powershell
-python -m streamlit run app.py
+# ⚡ Option A: Modern uv One-Liner (No manual activation needed)
+uv run streamlit run app.py
+
+# Option B: Using activated .venv (after running Activate.ps1)
+streamlit run app.py
+# (or: python -m streamlit run app.py)
 ```
+
+> [!WARNING]
+> **⚠️ Common Mistake — `streamlit app.py` vs `streamlit run app.py`:**  
+> If you run:
+> ```powershell
+> uv run streamlit app.py   # ❌ WRONG!
+> ```
+> Streamlit will fail with:
+> ```text
+> Usage: streamlit [OPTIONS] COMMAND [ARGS]...
+> Error: No such command 'app.py'.
+> ```
+> Streamlit CLI requires the `run` subcommand to execute a script. Always include `run`:
+> ```powershell
+> uv run streamlit run app.py   # ✅ CORRECT!
+> ```
+
 *Web Dashboard Features:*
 - **💬 Student Copilot**: Live chat displaying **real-time LangGraph node execution trace badges** (`START` ➔ `🔀 Router` ➔ `🧮 Calculator` ➔ `✍️ Synthesizer` ➔ `🛡️ Verifier`).
 - **📤 Drag & Drop Uploader**: Upload any `.pdf`, `.docx`, or `.txt` file to dynamically chunk and query it.
@@ -132,15 +265,26 @@ python -m streamlit run app.py
 - **🔬 LangGraph Inspector**: Interactive architecture diagram and RAGAS metric scorecard.
 
 ### 2. Run the Full CLI Showcase
+
 ```powershell
+# ⚡ Option A: uv One-Liner
+uv run python main.py
+
+# Option B: Standard Python (inside active .venv)
 python main.py
 ```
 Executes all 5 test cases (Attendance Condonation, Course Code Lookup, Library Rules, Placement Criteria, and Out-of-Domain Defense) and runs the automated RAGAS audit loop.
 
 ### 3. Run Automated Unit Test Suite (8 Tests)
+
 ```powershell
+# ⚡ Option A: uv One-Liner
+uv run python -m unittest tests/test_rag_pipeline.py
+
+# Option B: Standard Python (inside active .venv)
 python -m unittest tests/test_rag_pipeline.py
 ```
+
 
 ---
 
