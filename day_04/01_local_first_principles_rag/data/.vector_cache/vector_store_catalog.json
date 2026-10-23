@@ -1,0 +1,1197 @@
+{
+  "storage_type": "LangChain InMemoryVectorStore (RAM) + Disk Inspection Cache",
+  "total_vectors": 70,
+  "dimension": 6,
+  "vectors": [
+    {
+      "chunk_id": 0,
+      "doc_id": "kit_campus_hostel_and_mess_guide.docx_chunk_0",
+      "source": "kit_campus_hostel_and_mess_guide.docx",
+      "section": "General",
+      "format": "docx",
+      "text_snippet": "KIT College of Engineering - Hostel & Campus Life Guide",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0214,
+        -0.0063,
+        0.0092,
+        -0.0418,
+        -0.0062,
+        0.0035
+      ]
+    },
+    {
+      "chunk_id": 1,
+      "doc_id": "kit_campus_hostel_and_mess_guide.docx_chunk_1",
+      "source": "kit_campus_hostel_and_mess_guide.docx",
+      "section": "1. Gate Timings and Biometric Curfew",
+      "format": "docx",
+      "text_snippet": "All resident students must report back to their assigned hostel blocks by 8:30 PM. Facial recognition biometric punch-in is recorded at the ...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0191,
+        0.0121,
+        -0.0161,
+        -0.0466,
+        0.0098,
+        0.0162
+      ]
+    },
+    {
+      "chunk_id": 2,
+      "doc_id": "kit_campus_hostel_and_mess_guide.docx_chunk_2",
+      "source": "kit_campus_hostel_and_mess_guide.docx",
+      "section": "2. Mess and Cafeteria Operations",
+      "format": "docx",
+      "text_snippet": "The dining hall serves nutritious meals 4 times daily: Breakfast (7:15 AM - 8:45 AM), Lunch (12:15 PM - 1:45 PM), Snacks (4:30 PM - 5:30 PM)...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.024,
+        -0.0098,
+        0.0105,
+        -0.0188,
+        -0.027,
+        0.002
+      ]
+    },
+    {
+      "chunk_id": 3,
+      "doc_id": "kit_campus_hostel_and_mess_guide.docx_chunk_3",
+      "source": "kit_campus_hostel_and_mess_guide.docx",
+      "section": "3. Digital Connectivity & Campus Wi-Fi",
+      "format": "docx",
+      "text_snippet": "High-speed 1 Gbps fiber Wi-Fi is available across all hostel rooms and student lounges 24 hours a day.\nAcademic research portals including I...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0172,
+        0.0049,
+        -0.0067,
+        -0.0689,
+        -0.0274,
+        0.0255
+      ]
+    },
+    {
+      "chunk_id": 4,
+      "doc_id": "kit_college_student_handbook.md_chunk_4",
+      "source": "kit_college_student_handbook.md",
+      "section": "KIT College of Engineering & Technology",
+      "format": "markdown",
+      "text_snippet": "# KIT College of Engineering & Technology",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0219,
+        -0.0108,
+        -0.0014,
+        -0.058,
+        0.002,
+        0.0008
+      ]
+    },
+    {
+      "chunk_id": 5,
+      "doc_id": "kit_college_student_handbook.md_chunk_5",
+      "source": "kit_college_student_handbook.md",
+      "section": "Student Academic Regulations, Campus Policies & Code of Conduct (2025-2026)",
+      "format": "markdown",
+      "text_snippet": "## Student Academic Regulations, Campus Policies & Code of Conduct (2025-2026)\n\n---",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.004,
+        0.0061,
+        0.0085,
+        -0.0154,
+        0.0139,
+        0.0137
+      ]
+    },
+    {
+      "chunk_id": 6,
+      "doc_id": "kit_college_student_handbook.md_chunk_6",
+      "source": "kit_college_student_handbook.md",
+      "section": "1. Academic Regulations & Attendance Policy",
+      "format": "markdown",
+      "text_snippet": "## 1. Academic Regulations & Attendance Policy",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0081,
+        0.0108,
+        -0.0119,
+        -0.0187,
+        -0.0064,
+        0.0181
+      ]
+    },
+    {
+      "chunk_id": 7,
+      "doc_id": "kit_college_student_handbook.md_chunk_7",
+      "source": "kit_college_student_handbook.md",
+      "section": "1. Academic Regulations & Attendance Policy",
+      "format": "markdown",
+      "text_snippet": "### 1.1 Mandatory Attendance Threshold\n- Every enrolled student must maintain a minimum cumulative attendance of **75% in each registered co...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0131,
+        0.0355,
+        -0.0045,
+        -0.0354,
+        -0.0191,
+        0.0288
+      ]
+    },
+    {
+      "chunk_id": 8,
+      "doc_id": "kit_college_student_handbook.md_chunk_8",
+      "source": "kit_college_student_handbook.md",
+      "section": "1. Academic Regulations & Attendance Policy",
+      "format": "markdown",
+      "text_snippet": "- Attendance is recorded electronically on the KIT Student ERP portal at the end of every lecture hour.\n- Attendance weightage in Continuous...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0082,
+        0.034,
+        0.002,
+        -0.0433,
+        -0.0001,
+        0.0006
+      ]
+    },
+    {
+      "chunk_id": 9,
+      "doc_id": "kit_college_student_handbook.md_chunk_9",
+      "source": "kit_college_student_handbook.md",
+      "section": "1. Academic Regulations & Attendance Policy",
+      "format": "markdown",
+      "text_snippet": "### 1.2 Medical Condonation Policy (65% to 74.9%)\n- Students whose attendance falls between **65.0% and 74.9%** due to genuine medical illne...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0394,
+        0.0343,
+        -0.0077,
+        -0.0445,
+        0.0035,
+        0.0062
+      ]
+    },
+    {
+      "chunk_id": 10,
+      "doc_id": "kit_college_student_handbook.md_chunk_10",
+      "source": "kit_college_student_handbook.md",
+      "section": "1. Academic Regulations & Attendance Policy",
+      "format": "markdown",
+      "text_snippet": "- Required Procedure:\n  1. Submit a valid Government-registered Medical Practitioner Certificate along with discharge summary and prescripti...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0027,
+        -0.0041,
+        -0.0151,
+        -0.0157,
+        0.0023,
+        0.0049
+      ]
+    },
+    {
+      "chunk_id": 11,
+      "doc_id": "kit_college_student_handbook.md_chunk_11",
+      "source": "kit_college_student_handbook.md",
+      "section": "1. Academic Regulations & Attendance Policy",
+      "format": "markdown",
+      "text_snippet": "2. Pay a non-refundable condonation processing fee of **\u20b9500 per subject** at the Accounts Desk.\n  3. Final condonation is approved by the D...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0527,
+        -0.0125,
+        0.0001,
+        -0.0442,
+        0.0133,
+        0.0074
+      ]
+    },
+    {
+      "chunk_id": 12,
+      "doc_id": "kit_college_student_handbook.md_chunk_12",
+      "source": "kit_college_student_handbook.md",
+      "section": "1. Academic Regulations & Attendance Policy",
+      "format": "markdown",
+      "text_snippet": "### 1.3 Detention Rule (<65%)\n- Any student with attendance **below 65.0%** in any course shall be awarded the grade **'DE' (Detained)** for...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0177,
+        0.0417,
+        -0.0034,
+        -0.0329,
+        0.0061,
+        0.0065
+      ]
+    },
+    {
+      "chunk_id": 13,
+      "doc_id": "kit_college_student_handbook.md_chunk_13",
+      "source": "kit_college_student_handbook.md",
+      "section": "1. Academic Regulations & Attendance Policy",
+      "format": "markdown",
+      "text_snippet": "- The student must re-register and re-attend all lectures for that course during the subsequent academic year whenever offered.",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0037,
+        0.0255,
+        -0.0005,
+        -0.0317,
+        0.0056,
+        -0.0191
+      ]
+    },
+    {
+      "chunk_id": 14,
+      "doc_id": "kit_college_student_handbook.md_chunk_14",
+      "source": "kit_college_student_handbook.md",
+      "section": "1. Academic Regulations & Attendance Policy",
+      "format": "markdown",
+      "text_snippet": "### 1.4 On-Duty (OD) Leave Provision\n- Up to **10 working days of On-Duty (OD) leave** per semester is granted for students representing KIT...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0342,
+        0.0017,
+        -0.0061,
+        -0.0513,
+        -0.0043,
+        0.0125
+      ]
+    },
+    {
+      "chunk_id": 15,
+      "doc_id": "kit_college_student_handbook.md_chunk_15",
+      "source": "kit_college_student_handbook.md",
+      "section": "2. Examination, Evaluation Pattern & Passing Criteria",
+      "format": "markdown",
+      "text_snippet": "## 2. Examination, Evaluation Pattern & Passing Criteria",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0166,
+        -0.0248,
+        0.0055,
+        -0.0324,
+        0.008,
+        -0.0014
+      ]
+    },
+    {
+      "chunk_id": 16,
+      "doc_id": "kit_college_student_handbook.md_chunk_16",
+      "source": "kit_college_student_handbook.md",
+      "section": "2. Examination, Evaluation Pattern & Passing Criteria",
+      "format": "markdown",
+      "text_snippet": "### 2.1 Continuous Internal Assessment (CIA) - 50 Marks Total\nEach 4-credit course evaluation consists of two parts:\n1. **Continuous Assessm...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0199,
+        0.0009,
+        0.0129,
+        -0.0406,
+        0.0086,
+        0.0108
+      ]
+    },
+    {
+      "chunk_id": 17,
+      "doc_id": "kit_college_student_handbook.md_chunk_17",
+      "source": "kit_college_student_handbook.md",
+      "section": "2. Examination, Evaluation Pattern & Passing Criteria",
+      "format": "markdown",
+      "text_snippet": "2. **Continuous Assessment Test 2 (CAT-2)**: Conducted after 10 weeks of instruction. 30 marks, scaled down to 15 marks.\n3. **Mini-Project o...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0337,
+        -0.0075,
+        0.0273,
+        -0.077,
+        -0.0001,
+        -0.0133
+      ]
+    },
+    {
+      "chunk_id": 18,
+      "doc_id": "kit_college_student_handbook.md_chunk_18",
+      "source": "kit_college_student_handbook.md",
+      "section": "2. Examination, Evaluation Pattern & Passing Criteria",
+      "format": "markdown",
+      "text_snippet": "4. **Surprise Quizzes & Assignments**: 5 marks (2 online quizzes of 2.5 marks each).\n5. **Attendance Marks**: 5 marks based on Section 1.1 s...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0221,
+        0.0137,
+        0.0013,
+        -0.031,
+        0.0164,
+        -0.0048
+      ]
+    },
+    {
+      "chunk_id": 19,
+      "doc_id": "kit_college_student_handbook.md_chunk_19",
+      "source": "kit_college_student_handbook.md",
+      "section": "2. Examination, Evaluation Pattern & Passing Criteria",
+      "format": "markdown",
+      "text_snippet": "### 2.2 Semester End Examination (SEE) - 50 Marks Total\n- Conducted as a 3-hour comprehensive written exam covering the entire syllabus.\n- E...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0177,
+        -0.0067,
+        0.0214,
+        -0.0729,
+        0.0112,
+        -0.0045
+      ]
+    },
+    {
+      "chunk_id": 20,
+      "doc_id": "kit_college_student_handbook.md_chunk_20",
+      "source": "kit_college_student_handbook.md",
+      "section": "2. Examination, Evaluation Pattern & Passing Criteria",
+      "format": "markdown",
+      "text_snippet": "### 2.3 Passing Minimum Requirements\n- **SEE Passing Floor**: A student must secure a minimum of **45% marks in SEE (22.5 out of 50 marks)**...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0123,
+        0.0062,
+        -0.0124,
+        -0.0508,
+        0.02,
+        -0.0018
+      ]
+    },
+    {
+      "chunk_id": 21,
+      "doc_id": "kit_college_student_handbook.md_chunk_21",
+      "source": "kit_college_student_handbook.md",
+      "section": "2. Examination, Evaluation Pattern & Passing Criteria",
+      "format": "markdown",
+      "text_snippet": "- If a student scores >50 overall but fails to get 22.5/50 in SEE, the student is awarded an 'RA' (Re-Appear / Arrear) grade.",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0124,
+        0.0186,
+        0.0159,
+        -0.0792,
+        -0.0062,
+        0.0001
+      ]
+    },
+    {
+      "chunk_id": 22,
+      "doc_id": "kit_college_student_handbook.md_chunk_22",
+      "source": "kit_college_student_handbook.md",
+      "section": "2. Examination, Evaluation Pattern & Passing Criteria",
+      "format": "markdown",
+      "text_snippet": "---",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0059,
+        -0.0077,
+        0.0218,
+        -0.0452,
+        0.0192,
+        0.0077
+      ]
+    },
+    {
+      "chunk_id": 23,
+      "doc_id": "kit_college_student_handbook.md_chunk_23",
+      "source": "kit_college_student_handbook.md",
+      "section": "3. Central Library & Digital E-Resource Guidelines",
+      "format": "markdown",
+      "text_snippet": "## 3. Central Library & Digital E-Resource Guidelines",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0053,
+        -0.0118,
+        -0.0148,
+        -0.0252,
+        0.0039,
+        0.0182
+      ]
+    },
+    {
+      "chunk_id": 24,
+      "doc_id": "kit_college_student_handbook.md_chunk_24",
+      "source": "kit_college_student_handbook.md",
+      "section": "3. Central Library & Digital E-Resource Guidelines",
+      "format": "markdown",
+      "text_snippet": "### 3.1 Book Borrowing Quota and Duration\n- **Undergraduate (B.Tech / B.E.) Students**: May borrow up to **4 physical books** simultaneously...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0278,
+        0.0109,
+        0.0065,
+        -0.0208,
+        0.0055,
+        0.0141
+      ]
+    },
+    {
+      "chunk_id": 25,
+      "doc_id": "kit_college_student_handbook.md_chunk_25",
+      "source": "kit_college_student_handbook.md",
+      "section": "3. Central Library & Digital E-Resource Guidelines",
+      "format": "markdown",
+      "text_snippet": "- Standard loan period is **14 calendar days**.\n- Renewal is permitted once for an additional 7 days if no other student has placed a hold/r...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0186,
+        0.0284,
+        -0.0091,
+        -0.0348,
+        -0.0017,
+        -0.0065
+      ]
+    },
+    {
+      "chunk_id": 26,
+      "doc_id": "kit_college_student_handbook.md_chunk_26",
+      "source": "kit_college_student_handbook.md",
+      "section": "3. Central Library & Digital E-Resource Guidelines",
+      "format": "markdown",
+      "text_snippet": "### 3.2 Overdue Fines and Damage Penalties\n- Overdue fine of **\u20b95 per day per book** for the first 7 days after the due date.\n- Overdue fine...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0201,
+        0.0114,
+        0.0198,
+        -0.0387,
+        0.0056,
+        0.0067
+      ]
+    },
+    {
+      "chunk_id": 27,
+      "doc_id": "kit_college_student_handbook.md_chunk_27",
+      "source": "kit_college_student_handbook.md",
+      "section": "3. Central Library & Digital E-Resource Guidelines",
+      "format": "markdown",
+      "text_snippet": "- Loss or defacement of a library book incurs replacement of the identical latest edition plus a 20% administrative handling charge.",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0145,
+        0.0054,
+        0.0065,
+        -0.0496,
+        0.0135,
+        -0.0022
+      ]
+    },
+    {
+      "chunk_id": 28,
+      "doc_id": "kit_college_student_handbook.md_chunk_28",
+      "source": "kit_college_student_handbook.md",
+      "section": "3. Central Library & Digital E-Resource Guidelines",
+      "format": "markdown",
+      "text_snippet": "### 3.3 Digital Research Databases & Remote Access\n- The library subscribes to IEEE Xplore, ACM Digital Library, SpringerLink, Elsevier Scie...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0228,
+        -0.009,
+        0.0159,
+        -0.0233,
+        -0.0092,
+        0.0297
+      ]
+    },
+    {
+      "chunk_id": 29,
+      "doc_id": "kit_college_student_handbook.md_chunk_29",
+      "source": "kit_college_student_handbook.md",
+      "section": "3. Central Library & Digital E-Resource Guidelines",
+      "format": "markdown",
+      "text_snippet": "- 24x7 off-campus remote access is enabled through **OpenAthens Single Sign-On (SSO)** using the student's official `@kit.ac.in` college ema...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.026,
+        -0.0179,
+        -0.0199,
+        -0.0592,
+        -0.025,
+        0.0213
+      ]
+    },
+    {
+      "chunk_id": 30,
+      "doc_id": "kit_college_student_handbook.md_chunk_30",
+      "source": "kit_college_student_handbook.md",
+      "section": "3. Central Library & Digital E-Resource Guidelines",
+      "format": "markdown",
+      "text_snippet": "---",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0059,
+        -0.0077,
+        0.0218,
+        -0.0452,
+        0.0192,
+        0.0077
+      ]
+    },
+    {
+      "chunk_id": 31,
+      "doc_id": "kit_college_student_handbook.md_chunk_31",
+      "source": "kit_college_student_handbook.md",
+      "section": "4. Training, Internships & Campus Placement Regulations",
+      "format": "markdown",
+      "text_snippet": "## 4. Training, Internships & Campus Placement Regulations",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.015,
+        0.009,
+        0.0018,
+        -0.0311,
+        -0.0086,
+        0.0151
+      ]
+    },
+    {
+      "chunk_id": 32,
+      "doc_id": "kit_college_student_handbook.md_chunk_32",
+      "source": "kit_college_student_handbook.md",
+      "section": "4. Training, Internships & Campus Placement Regulations",
+      "format": "markdown",
+      "text_snippet": "### 4.1 Eligibility Criteria for Campus Recruitment\n- **General Registration Cutoff**: Students entering the 6th semester must have a cumula...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0228,
+        0.0314,
+        -0.0042,
+        -0.0219,
+        -0.01,
+        0.0319
+      ]
+    },
+    {
+      "chunk_id": 33,
+      "doc_id": "kit_college_student_handbook.md_chunk_33",
+      "source": "kit_college_student_handbook.md",
+      "section": "4. Training, Internships & Campus Placement Regulations",
+      "format": "markdown",
+      "text_snippet": "- **Tier-1 Dream Companies (CTC $\\ge$ \u20b910.0 LPA)**: Require CGPA $\\ge$ 8.00, 10th and 12th board marks $\\ge$ 75%, and a verified competitive...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0192,
+        0.0085,
+        0.0,
+        -0.0496,
+        0.0118,
+        0.0227
+      ]
+    },
+    {
+      "chunk_id": 34,
+      "doc_id": "kit_college_student_handbook.md_chunk_34",
+      "source": "kit_college_student_handbook.md",
+      "section": "4. Training, Internships & Campus Placement Regulations",
+      "format": "markdown",
+      "text_snippet": "- **Placement Training Attendance**: Minimum **85% attendance** is mandatory in Aptitude, Soft Skills, and Data Structures & Algorithms (DSA...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0231,
+        0.0245,
+        0.0223,
+        -0.0263,
+        -0.0214,
+        -0.0138
+      ]
+    },
+    {
+      "chunk_id": 35,
+      "doc_id": "kit_college_student_handbook.md_chunk_35",
+      "source": "kit_college_student_handbook.md",
+      "section": "4. Training, Internships & Campus Placement Regulations",
+      "format": "markdown",
+      "text_snippet": "### 4.2 The \"One-Offer\" and \"Dream Offer\" Policy\n- Once a student secures a campus job offer with a CTC of **\u20b95.0 LPA to \u20b99.99 LPA**, they a...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.014,
+        0.0286,
+        0.0083,
+        -0.0489,
+        -0.0306,
+        0.0041
+      ]
+    },
+    {
+      "chunk_id": 36,
+      "doc_id": "kit_college_student_handbook.md_chunk_36",
+      "source": "kit_college_student_handbook.md",
+      "section": "4. Training, Internships & Campus Placement Regulations",
+      "format": "markdown",
+      "text_snippet": "- Exception: A placed student is permitted to apply for up to **two \"Dream Companies\" (CTC $\\ge$ \u20b910.0 LPA)** or any **\"Super Dream Company\"...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0044,
+        0.0245,
+        -0.004,
+        -0.064,
+        -0.0014,
+        -0.0244
+      ]
+    },
+    {
+      "chunk_id": 37,
+      "doc_id": "kit_college_student_handbook.md_chunk_37",
+      "source": "kit_college_student_handbook.md",
+      "section": "4. Training, Internships & Campus Placement Regulations",
+      "format": "markdown",
+      "text_snippet": "### 4.3 Mandatory Summer Internship\n- Every student must complete a minimum of **8 weeks of industry internship** between the 6th and 7th se...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0126,
+        0.0084,
+        -0.0023,
+        -0.0385,
+        -0.0051,
+        0.0181
+      ]
+    },
+    {
+      "chunk_id": 38,
+      "doc_id": "kit_college_student_handbook.md_chunk_38",
+      "source": "kit_college_student_handbook.md",
+      "section": "4. Training, Internships & Campus Placement Regulations",
+      "format": "markdown",
+      "text_snippet": "- A final internship viva-voce is conducted in the 7th semester carrying **2 academic credits**.",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0224,
+        0.0037,
+        0.002,
+        -0.0512,
+        -0.0155,
+        -0.0033
+      ]
+    },
+    {
+      "chunk_id": 39,
+      "doc_id": "kit_college_student_handbook.md_chunk_39",
+      "source": "kit_college_student_handbook.md",
+      "section": "4. Training, Internships & Campus Placement Regulations",
+      "format": "markdown",
+      "text_snippet": "---",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0059,
+        -0.0077,
+        0.0218,
+        -0.0452,
+        0.0192,
+        0.0077
+      ]
+    },
+    {
+      "chunk_id": 40,
+      "doc_id": "kit_college_student_handbook.md_chunk_40",
+      "source": "kit_college_student_handbook.md",
+      "section": "5. Hostel Accommodation, Mess Timings & Campus Life",
+      "format": "markdown",
+      "text_snippet": "## 5. Hostel Accommodation, Mess Timings & Campus Life",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0261,
+        -0.0232,
+        0.0029,
+        -0.0319,
+        0.0021,
+        0.0059
+      ]
+    },
+    {
+      "chunk_id": 41,
+      "doc_id": "kit_college_student_handbook.md_chunk_41",
+      "source": "kit_college_student_handbook.md",
+      "section": "5. Hostel Accommodation, Mess Timings & Campus Life",
+      "format": "markdown",
+      "text_snippet": "### 5.1 Hostel Gate Curfew & Security Protocol\n- Main campus gates and hostel entry doors close strictly at **8:30 PM** every night.\n- Biome...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0048,
+        -0.001,
+        0.0025,
+        -0.0273,
+        0.01,
+        0.0364
+      ]
+    },
+    {
+      "chunk_id": 42,
+      "doc_id": "kit_college_student_handbook.md_chunk_42",
+      "source": "kit_college_student_handbook.md",
+      "section": "5. Hostel Accommodation, Mess Timings & Campus Life",
+      "format": "markdown",
+      "text_snippet": "- Late entry up to **9:30 PM** is permitted ONLY with an electronic gate pass issued by the Chief Warden for students utilizing Central Libr...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0034,
+        0.0066,
+        -0.0164,
+        -0.0349,
+        0.0067,
+        0.0155
+      ]
+    },
+    {
+      "chunk_id": 43,
+      "doc_id": "kit_college_student_handbook.md_chunk_43",
+      "source": "kit_college_student_handbook.md",
+      "section": "5. Hostel Accommodation, Mess Timings & Campus Life",
+      "format": "markdown",
+      "text_snippet": "### 5.2 Mess Facilities & Timings\n- Breakfast: 7:15 AM \u2013 8:45 AM\n- Lunch: 12:15 PM \u2013 1:45 PM\n- Evening Tea & Snacks: 4:30 PM \u2013 5:30 PM\n- Din...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0111,
+        -0.0147,
+        -0.0081,
+        -0.0083,
+        0.0011,
+        -0.0021
+      ]
+    },
+    {
+      "chunk_id": 44,
+      "doc_id": "kit_college_student_handbook.md_chunk_44",
+      "source": "kit_college_student_handbook.md",
+      "section": "5. Hostel Accommodation, Mess Timings & Campus Life",
+      "format": "markdown",
+      "text_snippet": "### 5.3 Anti-Ragging Absolute Zero Tolerance Policy\n- KIT enforces a **Zero-Tolerance Anti-Ragging Policy** in strict compliance with the Ho...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0084,
+        0.0332,
+        0.0109,
+        -0.0253,
+        -0.0094,
+        0.0169
+      ]
+    },
+    {
+      "chunk_id": 45,
+      "doc_id": "kit_college_student_handbook.md_chunk_45",
+      "source": "kit_college_student_handbook.md",
+      "section": "5. Hostel Accommodation, Mess Timings & Campus Life",
+      "format": "markdown",
+      "text_snippet": "1. Immediate suspension pending enquiry.\n  2. Expulsion from the college and hostel upon prima facie evidence.\n  3. Lodging of an official F...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0288,
+        0.0013,
+        -0.0268,
+        -0.0395,
+        0.0269,
+        0.02
+      ]
+    },
+    {
+      "chunk_id": 46,
+      "doc_id": "kit_college_student_handbook.md_chunk_46",
+      "source": "kit_college_student_handbook.md",
+      "section": "5. Hostel Accommodation, Mess Timings & Campus Life",
+      "format": "markdown",
+      "text_snippet": "---",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0059,
+        -0.0077,
+        0.0218,
+        -0.0452,
+        0.0192,
+        0.0077
+      ]
+    },
+    {
+      "chunk_id": 47,
+      "doc_id": "kit_college_student_handbook.md_chunk_47",
+      "source": "kit_college_student_handbook.md",
+      "section": "6. Fee Payment Schedules, Fines & Merit Scholarships",
+      "format": "markdown",
+      "text_snippet": "## 6. Fee Payment Schedules, Fines & Merit Scholarships",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0224,
+        0.009,
+        0.0178,
+        -0.0426,
+        -0.0217,
+        0.0403
+      ]
+    },
+    {
+      "chunk_id": 48,
+      "doc_id": "kit_college_student_handbook.md_chunk_48",
+      "source": "kit_college_student_handbook.md",
+      "section": "6. Fee Payment Schedules, Fines & Merit Scholarships",
+      "format": "markdown",
+      "text_snippet": "### 6.1 Semester Fee Payment Deadline\n- Tuition and hostel fees must be paid within **10 working days** from the commencement of the semeste...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0237,
+        0.0108,
+        0.0108,
+        -0.0477,
+        -0.0106,
+        0.0243
+      ]
+    },
+    {
+      "chunk_id": 49,
+      "doc_id": "kit_college_student_handbook.md_chunk_49",
+      "source": "kit_college_student_handbook.md",
+      "section": "6. Fee Payment Schedules, Fines & Merit Scholarships",
+      "format": "markdown",
+      "text_snippet": "- Hall tickets for semester examinations will NOT be generated if fee dues remain outstanding.",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0249,
+        0.0232,
+        -0.0014,
+        -0.0452,
+        -0.0217,
+        0.0004
+      ]
+    },
+    {
+      "chunk_id": 50,
+      "doc_id": "kit_college_student_handbook.md_chunk_50",
+      "source": "kit_college_student_handbook.md",
+      "section": "6. Fee Payment Schedules, Fines & Merit Scholarships",
+      "format": "markdown",
+      "text_snippet": "### 6.2 Founder's Merit Scholarship Scheme\n- **Semester Toppers (Rank 1 in Department)**: Awarded **50% Tuition Fee Waiver** for the subsequ...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0207,
+        0.0372,
+        0.0263,
+        -0.0556,
+        -0.027,
+        0.0306
+      ]
+    },
+    {
+      "chunk_id": 51,
+      "doc_id": "kit_college_student_handbook.md_chunk_51",
+      "source": "kit_college_student_handbook.md",
+      "section": "6. Fee Payment Schedules, Fines & Merit Scholarships",
+      "format": "markdown",
+      "text_snippet": "- **Merit-Cum-Means Scholarship**: \u20b925,000 annual scholarship for students with family income $< \u20b93,00,000$ per annum and CGPA $\\ge$ 8.00.",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0353,
+        0.0126,
+        0.0052,
+        -0.0581,
+        -0.0185,
+        0.0227
+      ]
+    },
+    {
+      "chunk_id": 52,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_52",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": "Record [kit_courses_and_curriculum.csv #1]: course_code: CS401 | course_name: Machine Learning & Generative AI | department: Computer Scienc...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0284,
+        -0.0042,
+        0.0167,
+        -0.0373,
+        0.0005,
+        0.0089
+      ]
+    },
+    {
+      "chunk_id": 53,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_53",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": "Record [kit_courses_and_curriculum.csv #2]: course_code: CS402 | course_name: Cloud Computing & DevOps Systems | department: Computer Scienc...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0017,
+        -0.0031,
+        0.026,
+        -0.0496,
+        0.0019,
+        0.0137
+      ]
+    },
+    {
+      "chunk_id": 54,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_54",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": ". Priya Sharma | faculty_email: priya.sharma@kit.ac.in | has_lab: Yes | prerequisites: Operating Systems & Networks | exam_date: 2026-11-18",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0102,
+        -0.0218,
+        0.0206,
+        -0.0486,
+        -0.0074,
+        -0.0171
+      ]
+    },
+    {
+      "chunk_id": 55,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_55",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": "Record [kit_courses_and_curriculum.csv #3]: course_code: CS403 | course_name: Database Management Systems | department: Computer Science | s...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0104,
+        -0.018,
+        0.0373,
+        -0.0489,
+        0.0192,
+        0.014
+      ]
+    },
+    {
+      "chunk_id": 56,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_56",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": "Record [kit_courses_and_curriculum.csv #4]: course_code: CS404 | course_name: Full-Stack Web Engineering | department: Computer Science | se...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.007,
+        -0.0124,
+        0.0336,
+        -0.0472,
+        0.0197,
+        0.0376
+      ]
+    },
+    {
+      "chunk_id": 57,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_57",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": ". Anita Desai | faculty_email: anita.desai@kit.ac.in | has_lab: Yes | prerequisites: Object Oriented Programming | exam_date: 2026-11-23",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0324,
+        -0.0057,
+        0.0002,
+        -0.0417,
+        -0.0143,
+        -0.0133
+      ]
+    },
+    {
+      "chunk_id": 58,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_58",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": "Record [kit_courses_and_curriculum.csv #5]: course_code: CS405 | course_name: Compiler Design & Optimization | department: Computer Science ...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0023,
+        -0.0068,
+        0.0287,
+        -0.0626,
+        0.0164,
+        0.0252
+      ]
+    },
+    {
+      "chunk_id": 59,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_59",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": "Record [kit_courses_and_curriculum.csv #6]: course_code: AI501 | course_name: Deep Learning & Computer Vision | department: Artificial Intel...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0006,
+        -0.0194,
+        0.0216,
+        -0.0686,
+        0.0031,
+        0.0038
+      ]
+    },
+    {
+      "chunk_id": 60,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_60",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": ". Arun Patel | faculty_email: arun.patel@kit.ac.in | has_lab: Yes | prerequisites: CS401 Machine Learning | exam_date: 2026-11-28",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0138,
+        0.0027,
+        0.025,
+        -0.0515,
+        0.0017,
+        -0.0237
+      ]
+    },
+    {
+      "chunk_id": 61,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_61",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": "Record [kit_courses_and_curriculum.csv #7]: course_code: AI502 | course_name: Natural Language Processing & RAG Agents | department: Artific...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0025,
+        -0.0038,
+        0.0245,
+        -0.0687,
+        -0.0023,
+        0.0003
+      ]
+    },
+    {
+      "chunk_id": 62,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_62",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": ". Sneha Reddy | faculty_email: sneha.reddy@kit.ac.in | has_lab: Yes | prerequisites: CS401 Machine Learning & Python | exam_date: 2026-12-01",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0219,
+        0.0227,
+        0.0067,
+        -0.0465,
+        -0.0142,
+        -0.0165
+      ]
+    },
+    {
+      "chunk_id": 63,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_63",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": "Record [kit_courses_and_curriculum.csv #8]: course_code: EC301 | course_name: Digital Signal Processing | department: Electronics & Comm | s...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0112,
+        -0.0199,
+        0.0185,
+        -0.0628,
+        0.0032,
+        -0.0015
+      ]
+    },
+    {
+      "chunk_id": 64,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_64",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": "Record [kit_courses_and_curriculum.csv #9]: course_code: EC302 | course_name: Microprocessors & Embedded IoT | department: Electronics & Com...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0017,
+        -0.0202,
+        0.0157,
+        -0.048,
+        0.0144,
+        -0.0014
+      ]
+    },
+    {
+      "chunk_id": 65,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_65",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": "Record [kit_courses_and_curriculum.csv #10]: course_code: MA201 | course_name: Discrete Mathematics & Graph Theory | department: Mathematics...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0141,
+        -0.0179,
+        0.0083,
+        -0.0373,
+        0.008,
+        0.0139
+      ]
+    },
+    {
+      "chunk_id": 66,
+      "doc_id": "kit_courses_and_curriculum.csv_chunk_66",
+      "source": "kit_courses_and_curriculum.csv",
+      "section": "General",
+      "format": "csv_tabular",
+      "text_snippet": ". S. Ramanathan | faculty_email: s.ramanathan@kit.ac.in | has_lab: No | prerequisites: Engineering Mathematics I & II | exam_date: 2026-11-1...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0126,
+        0.002,
+        0.0225,
+        -0.0571,
+        0.0053,
+        -0.0092
+      ]
+    },
+    {
+      "chunk_id": 67,
+      "doc_id": "kit_placement_policy_guide.pdf_chunk_67",
+      "source": "kit_placement_policy_guide.pdf",
+      "section": "Page 1",
+      "format": "pdf",
+      "text_snippet": "KIT College of Engineering & Technology - Training & Placement Policy (2025-2026)\n1. Eligibility Criteria: Minimum cumulative CGPA of 7.00 w...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        -0.0227,
+        0.0483,
+        0.0138,
+        -0.0332,
+        -0.0048,
+        0.0089
+      ]
+    },
+    {
+      "chunk_id": 68,
+      "doc_id": "kit_placement_policy_guide.pdf_chunk_68",
+      "source": "kit_placement_policy_guide.pdf",
+      "section": "Page 1",
+      "format": "pdf",
+      "text_snippet": "3. Super Dream Offer Threshold: CTC exceeding 20.0 LPA (allows one additional interview attempt).\n4. Mandatory Internship: 8-week summer ind...",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0058,
+        0.0169,
+        -0.0022,
+        -0.0646,
+        -0.0056,
+        -0.0086
+      ]
+    },
+    {
+      "chunk_id": 69,
+      "doc_id": "kit_placement_policy_guide.pdf_chunk_69",
+      "source": "kit_placement_policy_guide.pdf",
+      "section": "Page 1",
+      "format": "pdf",
+      "text_snippet": "6. Pre-Placement Training: 80% attendance required in Soft Skills and Technical Coding Bootcamps.",
+      "vector_dimension": 3072,
+      "vector_sample": [
+        0.0106,
+        0.0293,
+        0.0069,
+        -0.0322,
+        -0.016,
+        0.0143
+      ]
+    }
+  ]
+}

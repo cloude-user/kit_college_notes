@@ -27,14 +27,29 @@ class EnterpriseRAGASEvaluator:
 
     def evaluate_sample(
         self,
+        question: str = "",
+        answer: str = "",
+        contexts: List[str] = None,
+        ground_truth: str = "",
+        query: str = "",
+        retrieved_contexts: List[str] = None
+    ) -> RAGASMetrics:
+        """
+        Evaluates a single RAG inference sample across the RAG triad metrics.
+        """
+        q = query or question
+        ctx = retrieved_contexts if retrieved_contexts is not None else (contexts or [])
+        return self._do_evaluate(q, answer, ctx, ground_truth)
+
+    evaluate = evaluate_sample
+
+    def _do_evaluate(
+        self,
         question: str,
         answer: str,
         contexts: List[str],
         ground_truth: str
     ) -> RAGASMetrics:
-        """
-        Evaluates a single RAG inference sample across the RAG triad metrics.
-        """
         combined_context = " ".join(contexts).lower()
         ans_lower = answer.lower()
         gt_lower = ground_truth.lower()

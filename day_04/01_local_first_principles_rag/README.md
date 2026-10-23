@@ -1,167 +1,299 @@
-# Enterprise Financial & Compliance Multi-Agent RAG Assistant
-**Production-Grade AI Engineering Capstone · Module 04: RAG & Multi-Agent Systems**
+# 🎓 KIT College Student AI Copilot
+**Production-Grade Multi-Agent RAG Assistant · Module 04**  
+*Orchestrated with LangChain, LangGraph (`StateGraph`), and Google Gemini (3.7 / 3.6 / 3.5)*
 
 ---
 
-## 🎯 Executive Overview & Real-World Industry Context
-In enterprise environments (Banking, FinTech, Healthcare, Cloud SaaS), deploying a simple "toy" RAG script fails because:
-1. **Financial figures and error codes** require exact keyword matching (which pure dense vector search fails at).
-2. **Regulatory and compliance audits** require strict legal citations (`[Doc 1]`) and zero hallucinations.
-3. **Structured data (CSV/SQL)** cannot be queried reliably with pure text vector embeddings; it requires an **Agentic Router** that executes deterministic aggregation without math hallucination.
-4. **CI/CD Quality Gates** must automatically reject model regressions using automated **RAGAS** evaluations (Faithfulness $\ge 0.85$, Answer Relevancy $\ge 0.80$, Context Precision $\ge 0.75$, Context Recall $\ge 0.75$).
+## 📌 Executive Summary
+This capstone project is an enterprise-grade, student-centric **Retrieval-Augmented Generation (RAG)** assistant and **Autonomous Multi-Agent Copilot**. It is built specifically for **KIT College of Engineering & Technology** to resolve real student inquiries regarding academic policies, examination grading, attendance condonation, course curriculums, library loans, hostel curfews, and campus placements.
 
-This production project implements the complete, battle-tested architecture for **CloudCorp Technologies Inc.**, handling real-world enterprise documents, SEC filings, SOX compliance manuals, customer SLAs, and ERP general ledgers.
-
----
-
-## 🏛️ Authentic Real-World Enterprise Documents
-Rather than synthetic stubs, this system ingests genuine enterprise-grade documents:
-
-1. **SEC Form 10-Q Quarterly Report** (`data/sec_filing_q3_cloudcorp.md`):
-   - Commission File No. `001-39482`
-   - GAAP ASC-606 Revenue Recognition, Remaining Performance Obligations ($1.84 Billion RPO).
-   - Capital commitments for 16,384 Nvidia H100/H200 GPU compute clusters under 3-year operating leases.
-   - SRE telemetry failover error code disclosures (`ERR_STREAM_BUFFER_OVERFLOW_504`, `ERR_CRYPTO_HSM_TIMEOUT_509`).
-   - SOX Section 302 and 404 internal control assessments.
-
-2. **Corporate Compliance & Governance Manual** (`data/corporate_compliance_policy.md`):
-   - Document ID: `POL-FIN-SEC-2025-V2`
-   - Multi-tier procurement authorization thresholds (Tier 1 <$25K, Tier 2 $25K-$100K, Tier 3 $100K-$500K, Tier 4 >$500K Board of Directors Audit Committee).
-   - API key rotation cycle (mandatory 90 calendar days, automatic revocation after 95 days).
-   - SOX Section 404 WORM audit log retention (7-year immutable storage) and dual-signoff for journal entries exceeding $50,000.
-   - Hardware RMA defect replacement SLAs (14-day notice, overnight replacement, 30-day RMA return).
-   - GDPR Article 33 breach notification SLA (72 hours) and SOC-2 Type II NIST SP 800-88 cryptographic sanitization.
-
-3. **Master Cloud Services Agreement & SLA with GlobalBank N.A.** (`data/enterprise_cloud_msa_and_sla.md`):
-   - Agreement Reference: `MSA-GB-2024-8831`
-   - 99.99% multi-region high availability commitment across US-East, US-West, and EU-Central.
-   - Tiered service credits: Tier 1 (10%), Tier 2 (25% credit under `SLA-CREDIT-TIER-2`), Tier 3 (50% credit + termination right).
-   - Liquidated damages booked under General Ledger Account `GL-5120` (*Customer SLA Penalties & Rebates*).
-   - $15,000,000 aggregate liability cap.
-
-4. **Multi-Quarter Enterprise General Ledger** (`data/financial_ledger_2025.csv`):
-   - 21 realistic ledger records across 7 departments (Engineering-AI, Cloud-Infrastructure, Security-Compliance, Sales-Enterprise, Customer-Success, Legal-Regulatory, Data-Platform) for Q1, Q2, and Q3 2025.
-   - Includes GL accounts (`GL-6100`, `GL-5120`, `GL-7100`, etc.), cost centers, budget vs. actual spend, variance percentage, and auditor notes.
+Unlike basic naive RAG scripts that suffer from arithmetic hallucinations and context tearing, this architecture combines:
+- **LangChain** for multi-format document chunking (`RecursiveCharacterTextSplitter`), standardized embeddings, and vector stores (`InMemoryVectorStore`).
+- **LangGraph** for multi-agent state orchestration (`StateGraph`) with deterministic conditional routing.
+- **Google GenAI SDK** powering the latest **Gemini 3.7 Flash** (high reasoning tier), **Gemini 3.6 Flash**, and **Gemini 3.5 Flash Lite** models alongside `text-embedding-004`.
+- **Automated RAGAS CI/CD Quality Gates** verifying Faithfulness, Answer Relevancy, Context Precision, and Context Recall on every run.
 
 ---
 
-## 🏗️ System Architecture
+## 🏛️ Knowledge Base Directory (`data/`)
+All outdated corporate enterprise files have been removed. The knowledge base contains **only authentic, student-relevant campus documents**:
 
-```
-                                  ┌──────────────────────────────────────────────┐
-                                  │      ENTERPRISE MULTI-AGENT ARCHITECTURE     │
-                                  └──────────────────────────────────────────────┘
-
-                                                   ┌──────────────┐
-                                                   │ User Query   │
-                                                   └──────┬───────┘
-                                                          │
-                                                          ▼
-                                            ┌───────────────────────────┐
-                                            │   AUTONOMOUS ROUTER AGENT │
-                                            │ (Intent & Schema Dispatch)│
-                                            └─────────────┬─────────────┘
-                                                          │
-                    ┌─────────────────────────────────────┼─────────────────────────────────────┐
-                    ▼                                     ▼                                     ▼
-     ┌─────────────────────────────┐       ┌─────────────────────────────┐       ┌─────────────────────────────┐
-     │  HYBRID UNSTRUCTURED RAG    │       │  STRUCTURED DATA ANALYTICS  │       │   PROCUREMENT VALIDATOR     │
-     │  (SEC 10-Q, Policies, SLA)  │       │   (Financial Ledger CSV)    │       │  (Capital Expense Tiers)    │
-     └──────────────┬──────────────┘       └──────────────┬──────────────┘       └──────────────┬──────────────┘
-                    │                                     │                                     │
-                    ▼                                     │                                     │
-     ┌─────────────────────────────┐                      │                                     │
-     │   BM25 + Dense Vector (RRF) │                      │                                     │
-     │   + Cross-Encoder Reranker  │                      │                                     │
-     └──────────────┬──────────────┘                      │                                     │
-                    │                                     │                                     │
-                    ▼                                     ▼                                     │
-     ┌─────────────────────────────┐       ┌─────────────────────────────┐                      │
-     │ Grounded Context Generator  │       │ Aggregated SQL/Pandas Stats │                      │
-     │ (Bracket Citation Enforcer) │       │ (Exact Ledger Calculations) │                      │
-     └──────────────┬──────────────┘       └──────────────┬──────────────┘                      │
-                    │                                     │                                     │
-                    └──────────────────┬──────────────────┘                                     │
-                                       ▼                                                        │
-                        ┌─────────────────────────────┐                                         │
-                        │ RAGAS Quality Gate Audit    │ <───────────────────────────────────────┘
-                        │ (Faithfulness >= 0.85 Check)│
-                        └──────────────┬──────────────┘
-                                       │
-                                       ▼
-                        ┌─────────────────────────────┐
-                        │   VERIFIED ENTERPRISE ANS   │
-                        │     + SOURCE CITATIONS      │
-                        └─────────────────────────────┘
-```
+| File Name | Format | Ingestion Engine | Topics Covered |
+|---|---|---|---|
+| [`kit_college_student_handbook.md`](./data/kit_college_student_handbook.md) | **Markdown (.md)** | Section-Aware Markdown Parser | 75% attendance rule, 65%–74.9% medical condonation, CAT-1/CAT-2 grading, library fines (₹5/day), placement criteria. |
+| [`kit_campus_hostel_and_mess_guide.docx`](./data/kit_campus_hostel_and_mess_guide.docx) | **Word (.docx)** | `python-docx` Document Parser | Biometric hostel curfew (8:30 PM), library extension pass, 4-meal mess schedule, 24x7 Wi-Fi. |
+| [`kit_placement_policy_guide.pdf`](./data/kit_placement_policy_guide.pdf) | **PDF (.pdf)** | `pypdf` Multi-Page Extractor | CGPA 7.00 cutoff, Tier-1 Dream offers ($\ge$ ₹10 LPA), mandatory 8-week summer internship. |
+| [`kit_courses_and_curriculum.csv`](./data/kit_courses_and_curriculum.csv) | **CSV Tabular** | Python CSV & Pandas DataFrames | Course codes (`CS401 Machine Learning`), faculty (*Dr. Sundeep K.*), credits (4), and exam dates. |
 
 ---
 
-## 📂 Project Directory Structure
+## 📂 Source Code Breakdown: What Each File Does
+
+Every module in the [`src/`](./src) directory is dedicated to a distinct production responsibility:
 
 ```
-enterprise_financial_compliance_rag/
-├── README.md                      # Comprehensive architecture blueprint & usage guide
-├── main.py                        # Production showcase runner & RAGAS CI/CD audit loop
-├── app.py                         # Interactive Streamlit classroom demonstration dashboard
-│
-├── data/                          # Authentic enterprise knowledge base
-│   ├── sec_filing_q3_cloudcorp.md # Real-world SEC Form 10-Q quarterly report
-│   ├── corporate_compliance_policy.md # Internal corporate SOX compliance manual
-│   ├── enterprise_cloud_msa_and_sla.md # Master Services Agreement & SLA with GlobalBank
-│   └── financial_ledger_2025.csv  # Multi-quarter General Ledger with GL accounts
-│
-├── src/                           # Enterprise modular source package
-│   ├── __init__.py
-│   ├── models.py                  # Pydantic schemas (Document, Chunk, GroundedResponse, Metrics)
-│   ├── loaders.py                 # Multi-format ingestion (Markdown & Tabular CSV)
-│   ├── chunker.py                 # RecursiveCharacterTextSplitter with overlap & metadata
-│   ├── embedder.py                # Dual Cloud/Local normalized vector embedding engine
-│   ├── vector_store.py            # Cosine similarity vector store with metadata filtering
-│   ├── hybrid_retriever.py        # Dense Vector + BM25 Reciprocal Rank Fusion (RRF)
-│   ├── reranker.py                # Cross-Encoder candidate re-ranking module
-│   ├── generator.py               # Prompt synthesis with bracket citations & guardrails
-│   ├── evaluator.py               # Automated RAGAS evaluation suite & CI/CD quality gate
-│   └── agent.py                   # Multi-Tool ReAct Router Agent
-│
-└── tests/
-    └── test_rag_pipeline.py       # Automated unit & integration test suite (7 tests)
+src/
+├── models.py            # Pydantic & Dataclass domain schemas
+├── loaders.py           # Multi-format ingestion (PDF, Word, Markdown, CSV)
+├── chunker.py           # LangChain RecursiveCharacterTextSplitter engine
+├── embedder.py          # LangChain Embeddings adapter (Gemini text-embedding-004)
+├── vector_store.py      # LangChain InMemoryVectorStore adapter
+├── hybrid_retriever.py  # Dense Vector + Okapi BM25 Reciprocal Rank Fusion (RRF)
+├── reranker.py          # Cross-candidate re-ranking module
+├── generator.py         # Grounded generator powered by Gemini 3.7 / 3.6 with bracket citations
+├── langgraph_agent.py   # Compiled LangGraph StateGraph Multi-Agent Copilot
+├── evaluator.py         # Automated RAGAS evaluation harness (RAG Triad)
+└── agent.py             # ReAct router with tool calling
 ```
+
+### Detailed File Responsibilities:
+1. [**`models.py`**](./src/models.py): Defines type-safe schemas including `Document`, `Chunk`, `GroundedCitation`, `GroundedResponse`, and `RAGASMetrics`.
+2. [**`loaders.py`**](./src/loaders.py): Reads raw files from disk or in-memory byte streams (PDF via `pypdf`, Word via `python-docx`, Markdown via header splitting, CSV via DictReader).
+3. [**`chunker.py`**](./src/chunker.py): Wraps LangChain's `RecursiveCharacterTextSplitter` to hierarchically partition text while preserving metadata (`source`, `section`, `format`, `chunk_id`).
+4. [**`embedder.py`**](./src/embedder.py): Implements LangChain's `Embeddings` interface using Google GenAI `text-embedding-004` (with offline normalized semantic projection fallback).
+5. [**`vector_store.py`**](./src/vector_store.py): Implements LangChain's `InMemoryVectorStore`, providing cosine similarity search and standard `as_retriever()` export.
+6. [**`hybrid_retriever.py`**](./src/hybrid_retriever.py): Combines dense vector search with sparse Okapi BM25 keyword matching via Reciprocal Rank Fusion ($RRF = \frac{1}{60 + \text{rank}}$).
+7. [**`reranker.py`**](./src/reranker.py): Scores candidate chunks based on lexical overlap, positional proximity, and exact keyword matches.
+8. [**`generator.py`**](./src/generator.py): Injects context blocks into a hardened prompt and calls **Gemini 3.7 Flash** / **Gemini 3.6 Flash** to generate answers with mandatory `[Doc 1]` bracket citations.
+9. [**`langgraph_agent.py`**](./src/langgraph_agent.py): Compiles the directed `StateGraph` multi-agent workflow:
+   - `🔀 Router Node`: Detects query intent.
+   - `🧮 Condonation Calculator Node`: Deterministic attendance calculation (zero math hallucination).
+   - `📊 Course Catalog Node`: Exact tabular search across curriculum records.
+   - `📚 Policy RAG Node`: LangChain hybrid vector retrieval.
+   - `✍️ Synthesizer Node`: Context-grounded response generation.
+   - `🛡️ Citation Verifier Node`: Validates citation integrity.
+10. [**`evaluator.py`**](./src/evaluator.py): Evaluates Faithfulness, Answer Relevancy, Context Precision, and Context Recall against strict thresholds.
+11. [**`app.py`**](./app.py): Modern Streamlit interactive classroom dashboard featuring live LangGraph execution traces, drag-and-drop document upload, and an attendance simulator.
+12. [**`main.py`**](./main.py): CLI automated runner showcasing all 5 student test cases and the CI/CD quality gate.
 
 ---
 
-## 🚀 Quickstart & Execution
+## 🔄 End-to-End Control Flow & Application Architecture
 
-### 1. Run the Full Production Showcase & CI/CD Audit (CLI)
-```bash
-python day_04/enterprise_financial_compliance_rag/main.py
-```
-Outputs complete step-by-step agent reasoning, tool dispatching, grounded responses with bracket citations, and the automated RAGAS CI/CD quality gate audit (`BUILD PASSED`).
+How does a student prompt travel from the browser through LangGraph to produce a verified, cited answer? Below is the exact runtime lifecycle:
 
-### 2. Run the Unit & Integration Test Suite
-```bash
-python -m unittest day_04/enterprise_financial_compliance_rag/tests/test_rag_pipeline.py
+```mermaid
+flowchart TD
+    A([👤 Student Enters Query]) --> B[Streamlit Web App / CLI Entry Point]
+    B --> C{LangGraph StateGraph Router}
+    
+    %% Conditional Branching
+    C -->|Attendance % / Shortfall| D[🧮 Condonation Calculator Node]
+    C -->|Course Code / Faculty / Credits| E[📊 Course Catalog Node]
+    C -->|Regulations / Library / Hostel / Placements| F[📚 Policy Hybrid RAG Node]
+    
+    %% Node Actions
+    D -->|Deterministic Math: 75% - Att%| G[✍️ Grounded Synthesizer Node]
+    E -->|Structured Pandas CSV Lookup| G
+    F --> H[Hybrid Search Engine]
+    H -->|BM25 Sparse Retrieval| I[Reciprocal Rank Fusion RRF]
+    H -->|Dense Vector Cosine Sim| I
+    I -->|Top-K Context Chunks| G
+    
+    %% Synthesis & Guardrails
+    G -->|Prompt + Injected [Doc X] Headers| J{Is Context Sufficient?}
+    J -->|YES: In-Domain| K[Gemini 3.7 / 3.6 Flash / Local Engine]
+    J -->|NO: Out-of-Domain| L[🛡️ Defensive Refusal Guardrail]
+    
+    K --> M[🛡️ Citation Verifier Node]
+    L --> M
+    
+    %% Output
+    M -->|Audit [Doc X] References| N([📋 Display Grounded Answer + Trace Badges])
 ```
-Executes 7 unit tests covering document ingestion, chunk overlap integrity, BM25 exact error code retrieval, agent routing, GL account aggregations, procurement tiers, and RAGAS thresholds.
 
-### 3. Launch the Interactive Classroom Demonstration App (Streamlit)
-```bash
-streamlit run day_04/enterprise_financial_compliance_rag/app.py
-```
-Opens a high-end web dashboard featuring:
-- **Audit Copilot**: Real-time ReAct agent trajectory inspection.
-- **Hybrid Search Deep-Dive**: Side-by-side Dense Vector vs. BM25 vs. RRF vs. Re-ranker score inspection.
-- **General Ledger Analytics**: Interactive ERP pivot tables and variance metrics.
-- **Live RAGAS Audit**: Real-time evaluation scorecard measuring Faithfulness, Relevancy, Precision, and Recall.
-- **Document Explorer**: Full text inspection of SEC filings, policies, and contracts.
+### ⚡ The 3 Application Entry Points
+
+| Entry Point | Target Interface | Standard Command (`.venv` activated) | Modern `uv` One-Liner (No activation needed) | What It Runs |
+|:---|:---|:---|:---|:---|
+| [**`app.py`**](./app.py) | **Interactive Web UI** | `streamlit run app.py` *(or `python -m streamlit run app.py`)* | `uv run streamlit run app.py` | Full multi-tab Streamlit dashboard with real-time LangGraph execution trace badges, dynamic PDF/Notes uploader, attendance calculator slider, and course schedule table. |
+| [**`main.py`**](./main.py) | **Terminal / CLI** | `python main.py` | `uv run python main.py` | End-to-end automated runner executing 5 student test cases (Attendance, Course Catalog, Library, Placement, and Out-of-Domain Refusal) followed by the automated RAGAS CI/CD audit. |
+| [**`tests/test_rag_pipeline.py`**](./tests/test_rag_pipeline.py) | **Unit Test Suite** | `python -m unittest tests/test_rag_pipeline.py` | `uv run python -m unittest tests/test_rag_pipeline.py` | 8 automated unit tests verifying ingestion, chunking, vector storage, hybrid RRF search, LangGraph node paths, and RAGAS threshold gates in ~0.6 seconds. |
 
 ---
 
-## 🛡️ Enterprise Evaluation Benchmarks (RAGAS Triad)
-Every commit is validated against four strict assertions:
-| Metric | Threshold | Focus Area |
+## 🛡️ In-Domain vs. Out-of-Domain Guardrails (Zero Hallucination)
+
+Can anyone enter any prompt? **Yes!** The system is built with defensive guardrails to handle both relevant campus queries and irrelevant or adversarial questions:
+
+### Scenario A: Relevant In-Domain Prompt
+* **User Query**: *"What is the medical condonation fee if my attendance is 68%?"*
+* **LangGraph Trace**:
+  1. `🔀 Router Node`: Detects `68%` and `attendance`. Dispatches to `condonation_calculator`.
+  2. `🧮 Condonation Calculator Node`: Computes shortfall (`75.0% - 68.0% = 7.0%`). Confirms 68% is within the eligible condonation band ($65.0\% - 74.9\%$).
+  3. `✍️ Synthesizer Node`: Injects Section 1.2 of `kit_college_student_handbook.md`. Synthesizes answer with citation `[Doc 1]`.
+  4. `🛡️ Citation Verifier Node`: Validates citation integrity.
+* **Result**:
+  > **Official Academic Status**: `Medical Condonation Applicable` [Doc 1]  
+  > **Action Required**: Submit Government Doctor Medical Certificate within 3 calendar days of resuming classes, and pay ₹500 processing fee per subject [Doc 1].
+
+### Scenario B: Out-of-Domain / Irrelevant Prompt
+* **User Query**: *"Can students bring personal jet skis to the campus swimming pool?"* (or *"What is the current price of Bitcoin?"*)
+* **LangGraph Trace**:
+  1. `🔀 Router Node`: Routes to `policy_rag`.
+  2. `📚 Policy RAG Node`: Retrieves nearest handbook chunks; similarity scores fail relevance threshold.
+  3. `✍️ Synthesizer Node`: Applies the **Negative Constraint Rule**:
+     > *"If the answer cannot be determined strictly from the provided official documents, state: Insufficient context: The provided enterprise documentation does not contain this information."*
+  4. `🛡️ Citation Verifier Node`: Flags zero citations.
+* **Result**:
+  > **Answer**: `Insufficient context: The provided enterprise documentation does not contain this information.`  
+  > *(The agent refuses to hallucinate rules, fabricate pool policies, or guess).*
+
+---
+
+## 💡 How to Get the Most Out of the Streamlit UI
+
+When you run `python -m streamlit run app.py`, explore the 5 interactive tabs:
+
+1. **💬 Tab 1: Student Copilot & Graph Trace**:
+   - Type any question or click any of the **Quick Student Query buttons** in the sidebar.
+   - Watch the **Node Execution Trace Badges** light up in real time (`START` ➔ `🔀 Router` ➔ `🧮 Calculator` ➔ `✍️ Synthesizer` ➔ `🛡️ Citation Verifier` ➔ `END`).
+   - Expand the **Grounded Context Chunks** accordion to view exact text passages retrieved from the handbook.
+2. **📤 Tab 2: Upload Your Own Notes/PDF**:
+   - Drag and drop your own `.pdf`, `.docx`, `.md`, or `.txt` lecture notes.
+   - The app dynamically parses, recursively chunks, embeds, and merges them into the live in-memory vector store without restarting the server!
+3. **🧮 Tab 3: Attendance & Condonation Simulator**:
+   - Drag the attendance slider from 0% to 100%.
+   - Immediately visualizes institutional eligibility, detention warnings, condonation fees, and required paperwork.
+4. **📚 Tab 4: Course Catalog & Schedule**:
+   - Searchable, filterable table of all 10 campus courses with faculty names, credits, prerequisites, and exam dates.
+5. **🔬 Tab 5: LangGraph StateGraph Architecture**:
+   - Interactive Mermaid architecture diagram and live RAGAS metric scorecard.
+
+---
+
+## 📓 Interactive Classroom Jupyter Notebooks (`notebooks/`)
+
+Located in [`day_04/notebooks/`](../notebooks/), these 6 progressive notebooks walk students through RAG engineering step-by-step:
+
+| Notebook | Topic | Key Student Learning Takeaways |
 |---|---|---|
-| **Faithfulness** | $\ge 0.85$ | Groundedness in retrieved reference text; zero hallucinations |
-| **Answer Relevancy** | $\ge 0.80$ | Query alignment without conversational wandering |
-| **Context Precision** | $\ge 0.75$ | Signal-to-noise ratio at top retrieval ranks |
-| **Context Recall** | $\ge 0.75$ | Completeness of retrieved facts against ground truth |
+| [**`01_document_loaders_and_chunking_strategies.ipynb`**](../notebooks/01_document_loaders_and_chunking_strategies.ipynb) | **Ingestion & Chunking** | Parsing PDF, Word, and Markdown; comparing Character, Token, and LangChain Recursive splitting; understanding the physics of chunk overlap ($10\% - 20\%$). |
+| [**`02_vector_embeddings_and_vector_databases.ipynb`**](../notebooks/02_vector_embeddings_and_vector_databases.ipynb) | **Embeddings & Vector Stores** | High-dimensional geometric vector spaces, Cosine Similarity math, LangChain `InMemoryVectorStore`, and dense retrieval. |
+| [**`03_hybrid_search_and_reranking.ipynb`**](../notebooks/03_hybrid_search_and_reranking.ipynb) | **Hybrid Search & RRF** | Why dense search fails on exact course codes (`CS401`); implementing Okapi BM25 and blending rankings with Reciprocal Rank Fusion. |
+| [**`04_grounded_generation_and_hallucination_guardrails.ipynb`**](../notebooks/04_grounded_generation_and_hallucination_guardrails.ipynb) | **Grounded Generation** | Prompt framing, enforcing bracket citations (`[Doc 1]`), and defensive out-of-context refusal to prevent hallucinations. |
+| [**`05_rag_evaluation_with_ragas_and_ci_cd.ipynb`**](../notebooks/05_rag_evaluation_with_ragas_and_ci_cd.ipynb) | **RAGAS CI/CD Gates** | Measuring the RAG Triad: Faithfulness, Answer Relevancy, Context Precision, and Context Recall with automated pass/fail thresholds. |
+| [**`06_agentic_rag_and_multi_tool_react_agents.ipynb`**](../notebooks/06_agentic_rag_and_multi_tool_react_agents.ipynb) | **LangGraph & Multi-Agent** | Designing StateGraphs, defining TypedDict schemas, conditional branching edges, and deterministic tool execution. |
+
+---
+
+## 🛠️ Student Virtual Environment Setup Guide
+
+Students can follow either setup method below:
+
+### Track 1: Standard Python `venv`
+```powershell
+# 1. Navigate to the project directory
+cd f:\KIT\notes\kit_college_notes\day_04\01_local_first_principles_rag
+
+# 2. Create the virtual environment
+python -m venv .venv
+
+# 3. Activate the environment (Windows PowerShell)
+.\.venv\Scripts\Activate.ps1
+# (On macOS / Linux: source .venv/bin/activate)
+
+# 4. Install dependencies
+pip install -r requirements.txt
+
+# 5. Configure API Key
+copy .env.example .env
+# Open .env and insert your GEMINI_API_KEY
+```
+
+### Track 2: Ultra-Fast `uv` (Rust-Based Workflow)
+```powershell
+# 1. Navigate to the project directory
+cd f:\KIT\notes\kit_college_notes\day_04\01_local_first_principles_rag
+
+# 2. Create the virtual environment in milliseconds
+uv venv
+
+# 3. Activate the environment (Windows PowerShell)
+.\.venv\Scripts\Activate.ps1
+# (On macOS / Linux: source .venv/bin/activate)
+
+# 4. Install dependencies at lightning speed
+uv pip install -r requirements.txt
+
+# 5. Configure API Key
+copy .env.example .env
+# Open .env and insert your GEMINI_API_KEY
+```
+
+> ⚡ **The `uv run` One-Liner Advantage:**  
+> When using `uv`, you don't even need to manually run `Activate.ps1`! `uv run` automatically detects and uses the local `.venv`.
+
+---
+
+## 🚀 Execution & Verification
+
+You can run the application either with `uv run` (recommended, no manual activation needed) or using standard commands inside an activated `.venv`:
+
+### 1. Launch Interactive Streamlit Classroom App
+
+```powershell
+# ⚡ Option A: Modern uv One-Liner (No manual activation needed)
+uv run streamlit run app.py
+
+# Option B: Using activated .venv (after running Activate.ps1)
+streamlit run app.py
+# (or: python -m streamlit run app.py)
+```
+
+> [!WARNING]
+> **⚠️ Common Mistake — `streamlit app.py` vs `streamlit run app.py`:**  
+> If you run:
+> ```powershell
+> uv run streamlit app.py   # ❌ WRONG!
+> ```
+> Streamlit will fail with:
+> ```text
+> Usage: streamlit [OPTIONS] COMMAND [ARGS]...
+> Error: No such command 'app.py'.
+> ```
+> Streamlit CLI requires the `run` subcommand to execute a script. Always include `run`:
+> ```powershell
+> uv run streamlit run app.py   # ✅ CORRECT!
+> ```
+
+*Web Dashboard Features:*
+- **💬 Student Copilot**: Live chat displaying **real-time LangGraph node execution trace badges** (`START` ➔ `🔀 Router` ➔ `🧮 Calculator` ➔ `✍️ Synthesizer` ➔ `🛡️ Verifier`).
+- **📤 Drag & Drop Uploader**: Upload any `.pdf`, `.docx`, or `.txt` file to dynamically chunk and query it.
+- **🧮 Attendance Simulator**: Interactive slider showing exact rules and medical condonation requirements.
+- **📚 Course Catalog Explorer**: Filterable schedule of subjects, credits, and faculty.
+- **🔬 LangGraph Inspector**: Interactive architecture diagram and RAGAS metric scorecard.
+
+### 2. Run the Full CLI Showcase
+
+```powershell
+# ⚡ Option A: uv One-Liner
+uv run python main.py
+
+# Option B: Standard Python (inside active .venv)
+python main.py
+```
+Executes all 5 test cases (Attendance Condonation, Course Code Lookup, Library Rules, Placement Criteria, and Out-of-Domain Defense) and runs the automated RAGAS audit loop.
+
+### 3. Run Automated Unit Test Suite (8 Tests)
+
+```powershell
+# ⚡ Option A: uv One-Liner
+uv run python -m unittest tests/test_rag_pipeline.py
+
+# Option B: Standard Python (inside active .venv)
+python -m unittest tests/test_rag_pipeline.py
+```
+
+
+---
+
+## 🛡️ Automated RAGAS CI/CD Quality Gate Benchmarks
+
+Every commit and build is validated against four strict assertions:
+| Metric | Threshold | Current Score | Focus Area |
+|---|---|---|---|
+| **Faithfulness** | $\ge 0.85$ | **1.000** | Groundedness in reference text; zero hallucinations |
+| **Answer Relevancy** | $\ge 0.80$ | **0.833** | Query alignment without conversational wandering |
+| **Context Precision** | $\ge 0.75$ | **1.000** | Signal-to-noise ratio at top retrieval ranks |
+| **Context Recall** | $\ge 0.75$ | **0.875** | Completeness of retrieved facts against ground truth |

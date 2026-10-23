@@ -1,16 +1,18 @@
 """
 chunker.py
-Production Recursive Character Text Splitter with Overlap Management.
-Prevents context tearing at document boundaries and enriches chunks with metadata.
+Production Document Chunking Engine powered by LangChain's RecursiveCharacterTextSplitter.
+Prevents semantic boundary tearing and preserves metadata lineage across all chunks.
 """
 
 from typing import List, Dict, Any
+from langchain_core.documents import Document as LCDocument
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from .models import Document, Chunk
 
 class EnterpriseRecursiveChunker:
     """
-    Splits documents into semantic chunks using hierarchical separators.
-    Preserves paragraph context, sentence structure, and metadata lineage.
+    Industrial chunker utilizing LangChain's RecursiveCharacterTextSplitter.
+    Hierarchically splits text on paragraph, sentence, and word boundaries.
     """
     def __init__(
         self,
@@ -22,88 +24,61 @@ class EnterpriseRecursiveChunker:
             raise ValueError("chunk_overlap must be strictly less than chunk_size")
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
-        self.separators = separators or ["\n\n", "\n", ". ", "; ", ", ", " ", ""]
+        self.separators = separators or ["\n## ", "\n### ", "\n\n", "\n", ". ", "; ", ", ", " ", ""]
+        
+        # Initialize official LangChain text splitter
+        self.splitter = RecursiveCharacterTextSplitter(
+            chunk_size=self.chunk_size,
+            chunk_overlap=self.chunk_overlap,
+            separators=self.separators,
+            length_function=len,
+            is_separator_regex=False
+        )
 
     def split_text(self, text: str) -> List[str]:
-        """Splits raw string into overlapping chunks."""
-        pieces: List[str] = []
-        self._split_recursive(text, self.separators, pieces)
-        return self._merge_pieces_with_overlap(pieces)
-
-    def _split_recursive(self, text: str, separators: List[str], pieces: List[str]):
-        if len(text) <= self.chunk_size:
-            pieces.append(text)
-            return
-
-        separator = separators[-1]
-        new_separators = []
-        for i, sep in enumerate(separators):
-            if sep == "":
-                separator = ""
-                break
-            if sep in text:
-                separator = sep
-                new_separators = separators[i + 1:]
-                break
-
-        splits = text.split(separator) if separator != "" else list(text)
-
-        for s in splits:
-            s_clean = s.strip()
-            if not s_clean:
-                continue
-            if len(s_clean) <= self.chunk_size or not new_separators:
-                pieces.append(s_clean)
-            else:
-                self._split_recursive(s_clean, new_separators, pieces)
-
-    def _merge_pieces_with_overlap(self, pieces: List[str]) -> List[str]:
-        chunks: List[str] = []
-        current_chunk: List[str] = []
-        current_len = 0
-
-        for piece in pieces:
-            piece_len = len(piece)
-            if current_len + piece_len + 1 > self.chunk_size and current_chunk:
-                chunks.append(" ".join(current_chunk))
-                
-                # Compute overlap window from tail
-                overlap_chars = 0
-                overlap_pieces = []
-                for p in reversed(current_chunk):
-                    if overlap_chars + len(p) <= self.chunk_overlap:
-                        overlap_pieces.insert(0, p)
-                        overlap_chars += len(p) + 1
-                    else:
-                        break
-                current_chunk = overlap_pieces
-                current_len = sum(len(p) + 1 for p in current_chunk)
-
-            current_chunk.append(piece)
-            current_len += piece_len + 1
-
-        if current_chunk:
-            chunks.append(" ".join(current_chunk))
-
-        return chunks
+        """Splits raw string into overlapping chunks using LangChain splitter."""
+        return self.splitter.split_text(text)
 
     def chunk_documents(self, documents: List[Document]) -> List[Chunk]:
-        """Converts high-level Document objects into indexed, lineage-tracked Chunks."""
+        """
+        Converts internal Document instances into semantic Chunk instances,
+        preserving metadata lineage and chunk IDs.
+        """
         all_chunks: List[Chunk] = []
+        global_chunk_id = 0
 
         for doc_idx, doc in enumerate(documents):
-            text_splits = self.split_text(doc.page_content)
-            for chunk_idx, text in enumerate(text_splits):
-                meta = doc.metadata.copy()
-                meta["chunk_index"] = chunk_idx
-                meta["total_document_chunks"] = len(text_splits)
+            sub_texts = self.split_text(doc.page_content)
+            for idx, text in enumerate(sub_texts):
+                chunk_meta = dict(doc.metadata)
+                chunk_meta["chunk_index"] = idx
+                chunk_meta["total_subchunks"] = len(sub_texts)
+                chunk_meta["char_length"] = len(text)
                 
+                src_clean = doc.metadata.get("source", f"doc_{doc_idx}")
                 all_chunks.append(
                     Chunk(
                         text=text,
-                        metadata=meta,
-                        chunk_id=len(all_chunks),
-                        doc_id=f"doc_{doc_idx}_chunk_{chunk_idx}"
+                        metadata=chunk_meta,
+                        chunk_id=global_chunk_id,
+                        doc_id=f"{src_clean}_chunk_{global_chunk_id}"
                     )
                 )
+                global_chunk_id += 1
+
         return all_chunks
+
+    def chunk_to_langchain_documents(self, documents: List[Document]) -> List[LCDocument]:
+        """
+        Directly transforms documents into official LangChain Document instances.
+        """
+        chunks = self.chunk_documents(documents)
+        lc_docs: List[LCDocument] = []
+        for c in chunks:
+            lc_docs.append(
+                LCDocument(
+                    page_content=c.text,
+                    metadata=c.metadata
+                )
+            )
+        return lc_docs
