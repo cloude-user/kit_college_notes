@@ -235,3 +235,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+.kit
+.kit/
+
